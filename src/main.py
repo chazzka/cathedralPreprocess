@@ -1,6 +1,6 @@
 
 from preprocessing.preprocessing import preprocessAPIData, preprocessCSVData
-from service.request import getCSVData, fetchToJson, jsonDestringify, fetchToJsonWithHeaders
+from service.request import getCSVData, fetchToJsonWithHeaders
 from ai.trainer import doTrain, saveModel, loadModel
 
 import sys
