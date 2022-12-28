@@ -1,7 +1,7 @@
 import unittest
 
 from src.preprocessing.preprocessing import getNumberEight
-from src.preprocessing.preprocessing import dateTimeToMilliseconds
+from src.preprocessing.preprocessing import CSVDateTimeToMilliseconds
 from src.service.request import fetchToJson
 from src.service.request import jsonDestringify
 
@@ -11,7 +11,7 @@ class TestPreprocessing(unittest.TestCase):
         self.assertEqual(getNumberEight(), 8)
 
     def testDateTimeToMilliseconds(self):
-        self.assertEqual(dateTimeToMilliseconds('2016-12-20 09:38:42.000'), 1482223122000.0)
+        self.assertEqual(CSVDateTimeToMilliseconds('2016-12-20 09:38:42.000'), 1482223122000.0)
 
 
 class TestRequest(unittest.TestCase):

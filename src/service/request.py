@@ -8,7 +8,7 @@ import requests
 
 
 def getCSVData(source: str) -> pandas.DataFrame:
-    return pandas.read_csv(source ,usecols=['ID','Time','ID_iot_device','averageCurrent'])
+    return pandas.read_csv(source ,usecols=['ID','@dDevdCasZpravy','ID_iot_device','@iDevdAverageCurrent'])
 
 
 def fetchToJson(api_url: str):
