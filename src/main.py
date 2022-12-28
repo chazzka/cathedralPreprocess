@@ -1,4 +1,3 @@
-
 from preprocessing.preprocessing import preprocessAPIData, preprocessCSVData
 from service.request import getCSVData, fetchToJsonWithHeaders
 from ai.trainer import doTrain, saveModel, loadModel
