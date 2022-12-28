@@ -8,13 +8,14 @@ def getNumberEight():
 
 
 def preprocess(data: pandas.DataFrame ):
-    filtered = data[(data.ID_iot_device == 3) & (data.averageCurrent != 0)]
-    filtered['Time'] = filtered['Time'].apply(dateTimeToMilliseconds)
+    #filtered = data[(data['@iDevdAverageCurrent'] != 0)]
+    filtered = data
+    filtered['@dDevdCasZpravy'] = filtered['@dDevdCasZpravy'].apply(dateTimeToMilliseconds)
     return filtered
 
 
 def dateTimeToMilliseconds(datetimeString):
     dt_obj = datetime.strptime(datetimeString,
-                           '%Y-%m-%d %H:%M:%S.%f')
+                           '%Y-%m-%dT%H:%M:%S')
     millisec = dt_obj.timestamp() * 1000
     return millisec
