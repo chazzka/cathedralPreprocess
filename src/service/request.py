@@ -22,10 +22,3 @@ def fetchToJsonWithHeaders(api_url: str, data: object, auth: tuple):
     json_response = json.loads(response.text)
     return json_response
 
-
-def jsonDestringify(res: str):
-    return res.replace("\\", "")
-
-
-def parseXMLRes(res: str):
-    pass
