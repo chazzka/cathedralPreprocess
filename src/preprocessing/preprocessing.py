@@ -9,20 +9,20 @@ def getNumberEight():
     return 8
 
 
-def preprocess(url, data, auth):
+def preprocess(url, data, auth) -> pandas.DataFrame:
     res = fetchToJsonWithHeaders(
         url, data, auth)
 
     dataFrameRes = convertToDF(res)
-    return preprocessAPIData(dataFrameRes)
+    return preprocessAPIDataFrame(dataFrameRes)
 
 
-def preprocessAPIData(data: pandas.DataFrame):
-    # filtered = data[(data['@iDevdAverageCurrent'] != 0)]
+def preprocessAPIDataFrame(data: pandas.DataFrame):
+    idColumn = data['@ID']
     timeColumn = data['@dDevdCasZpravy'].apply(apiDateTimeToMilliseconds)
     averageColumn = data['@iDevdAverageCurrent'].astype(float)
     filtered = pandas.DataFrame(
-        data={'@dDevdCasZpravy': timeColumn, '@iDevdAverageCurrent': averageColumn})
+        data={'@ID': idColumn, '@dDevdCasZpravy': timeColumn, '@iDevdAverageCurrent': averageColumn})
     return filtered
 
 
@@ -55,21 +55,7 @@ def CSVDateTimeToMilliseconds(datetimeString):
     return millisec
 
 
-@dataclass(frozen=True)
-class Row:
-    id: int
-    bDevdAvgCurrentAnomaly: bool
-
-
-def prepareRowXML(row: Row):
-    return f'<ROW ID=\"{row.id}\" bDevdAvgCurrentAnomaly=\"{row.bDevdAvgCurrentAnomaly}\"/>'
-
-
-def prepareRowsXML(idAnomalyDics: list[Row]):
-    return list(map(prepareRowXML, idAnomalyDics))
-
-
-def convertToDF(json: dict):
+def convertToDF(json: dict) -> pandas.DataFrame:
     xmlres = xtd.parse(json['result'][2])
     dictRes = xmlres['DATAPACKET']['ROWDATA']['ROW']
     return pandas.DataFrame.from_dict(dictRes)
