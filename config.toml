@@ -1,0 +1,19 @@
+# config.toml
+
+auth = ["a_ulrich@utb.cz", "EcCNVU/dS76jpE938WxRHRGmjRM="]
+
+
+
+[server]
+url = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst"
+posturl = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst"
+
+[args]
+daystostrip = 1000
+idColumnName = "@ID"
+averageColumnName = "@iDevdAverageCurrent"
+timeColumnName = "@dDevdCasZpravy"
+apiDataIndentifier = "iot_device_data"
+deviceIdLst = 3
+modelPath = "models/model.pckl"
+

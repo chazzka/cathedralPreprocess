@@ -2,11 +2,16 @@ from service.request import fetchToJsonWithHeaders
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
 
+CLUSTER_BOOL_COLUMN = "isCluster"
 
-def postprocess(df, url, data, auth, idColumn, clusterBoolColumn):
-    res = fetchToJsonWithHeaders(url, data, auth)
 
-    rows = prepareListOfRows(df, idColumn, clusterBoolColumn)
+def postprocess(df, config):
+    data = {"_parameters": [config["args"]["apiDataIndentifier"], "", 0]}
+    res = fetchToJsonWithHeaders(
+        config["server"]["url"], tuple(config["auth"]), data)
+
+    rows = prepareListOfRows(
+        df, config["args"]["idColumnName"], CLUSTER_BOOL_COLUMN)
 
     x = prepareRowsXML(rows)
     return res['result'][2].replace(

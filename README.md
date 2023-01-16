@@ -31,5 +31,6 @@ python3 src/main.py a_ulrich@utb.cz EcCNVU/dS76jpE938WxRHRGmjRM= 1000 https://in
 
 
 
+
 # exit code 1
  - no cluster found
