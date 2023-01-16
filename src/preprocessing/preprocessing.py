@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import xmltodict as xtd
 from service.request import fetchToJsonWithHeaders
 
-import sys
+import logging
 
 def getNumberEight():
     return 8
@@ -60,9 +60,8 @@ def convertToDF(json: dict) -> pandas.DataFrame:
     xmlres = xtd.parse(json['result'][2], force_list={'ROW'})
     try:
         dictRes = xmlres['DATAPACKET']['ROWDATA']['ROW']
-        print(dictRes)
     except IndexError:
-        print("error, no data found")
+        logging.error("No data found in json from API.")
         return pandas.DataFrame()
 
 

@@ -11,6 +11,7 @@ from sklearn.cluster import KMeans
 
 import pickle
 import pandas
+import logging
 
 # accept dataframe, return trained model
 
@@ -33,7 +34,7 @@ def getClusters(df, timeColumnName, averageColumnName):
     try:
         cluster = findCluster(anomalies[[timeColumnName, averageColumnName]])
     except:
-        print("no cluster found")
+        logging.error("no cluster found")
         return pandas.DataFrame()
 
     # here might be better to assign to the previous df, not only anomalies

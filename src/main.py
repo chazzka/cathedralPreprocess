@@ -1,3 +1,5 @@
+import logging
+
 from preprocessing.preprocessing import preprocess
 from ai.trainer import loadModel, predict
 from postprocessing.postprocessing import postprocess, plotPredictedDataFrame
@@ -13,8 +15,9 @@ def getCurrentTimeAsDTString(time=datetime.now(), daysSub=0):
 
 if __name__ == "__main__":
 
-    # TODO: later args
-    shouldTrain = 0
+    logging.basicConfig(filename='logs/debug.log',
+                        encoding='utf-8', level=logging.DEBUG)
+
     username = sys.argv[1]
     password = sys.argv[2]
     daystostrip = sys.argv[3]
@@ -25,7 +28,7 @@ if __name__ == "__main__":
     posturl = sys.argv[5]
 
     body = {"_parameters": ["iot_device_data", "", 0,
-                           f"/sDeviceIdLst:\"3\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=daystostrip)}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
+                            f"/sDeviceIdLst:\"3\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=daystostrip)}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
     auth = (username, password)
 
     averageColumnName = "@iDevdAverageCurrent"
@@ -43,13 +46,15 @@ if __name__ == "__main__":
     if predictedDataFrame.empty:
         sys.exit(1)
 
-    # postprocess - accept dataframe, return whatever they want
+    # postprocess - accept dataframe
+    logging.info("starting postprocessing")
     data = {"_parameters": ["iot_device_data", "", 0]}
     postprocessed = postprocess(
         predictedDataFrame, url, data, auth, '@ID', 'isCluster')
 
-    print(postprocessed)
-    # send result wherever they want
+    logging.info(postprocessed)
+
+    # send result
     res = fetchToJsonWithHeaders(posturl, data={"_parameters": [
                                  "iot_device_data", postprocessed, 0]}, auth=auth)
 
