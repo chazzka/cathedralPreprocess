@@ -34,10 +34,10 @@ def getClusters(df, timeColumnName, averageColumnName):
         cluster = findCluster(anomalies[[timeColumnName, averageColumnName]])
     except:
         print("no cluster found")
-        return 1
-    finally:
-        # here might be better to assign to the previous df, not only anomalies
-        return anomalies.assign(isCluster=cluster)
+        return pandas.DataFrame()
+
+    # here might be better to assign to the previous df, not only anomalies
+    return anomalies.assign(isCluster=cluster)
 
 
 def getAnomalies(df):
