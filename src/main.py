@@ -4,7 +4,6 @@ from postprocessing.postprocessing import postprocess, plotPredictedDataFrame
 from service.request import fetchToJsonWithHeaders
 
 import sys
-import time
 from datetime import datetime, timedelta
 
 
