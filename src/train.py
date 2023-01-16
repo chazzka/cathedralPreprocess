@@ -1,6 +1,6 @@
-from preprocessing.preprocessing import preprocessCSVData, prepareRowsXML, Row, preprocess
-from service.request import getCSVData, fetchToJsonWithHeaders
-from ai.trainer import doTrain, saveModel, loadModel, findCluster
+from preprocessing.preprocessing import preprocessCSVData
+from service.request import getCSVData
+from ai.trainer import doTrain, saveModel, findCluster
 
 import sys
 import pandas
@@ -49,12 +49,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     clusterLabeledDf = dfAnomalies.assign(isCluster=cluster)
-
-    # here send post
-
-    # get header metadata
-
-    # TODO: POSTPROCESS
 
     # the rest is not a cluster (just for pretty printing)
     toMerge = noAnomaly[[timeColumnName,

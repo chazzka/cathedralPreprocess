@@ -28,7 +28,7 @@ def prepareListOfRows(df, idColumn, clusterBoolColumn):
 
 
 def prepareRowXML(row: Row):
-    return f'<ROW ID=\"{row.id}\" bDevdAvgCurrentAnomaly=\"{row.bDevdAvgCurrentAnomaly}\"/>'
+    return f'<ROW ID=\"{row.id}\" bDevdAvgCurrentAnomaly=\"{bool(row.bDevdAvgCurrentAnomaly)}\"/>'
 
 
 def prepareRowsXML(idAnomalyDics: list[Row]):
