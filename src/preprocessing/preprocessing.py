@@ -10,20 +10,20 @@ def getNumberEight():
     return 8
 
 
-def preprocess(url, data, auth) -> pandas.DataFrame:
+def preprocess(url, data, auth, desiredColumns) -> pandas.DataFrame:
     res = fetchToJsonWithHeaders(
         url, data, auth)
 
     dataFrameRes = convertToDF(res)
-    return preprocessAPIDataFrame(dataFrameRes)
+    return preprocessAPIDataFrame(dataFrameRes, desiredColumns)
 
 
-def preprocessAPIDataFrame(data: pandas.DataFrame):
-    idColumn = data['@ID']
-    timeColumn = data['@dDevdCasZpravy'].apply(apiDateTimeToMilliseconds)
-    averageColumn = data['@iDevdAverageCurrent'].astype(float)
+def preprocessAPIDataFrame(data: pandas.DataFrame, desiredColumns):
+    idColumn = data[desiredColumns['idColumnName']]
+    timeColumn = data[desiredColumns['timeColumnName']].apply(apiDateTimeToMilliseconds)
+    averageColumn = data[desiredColumns['averageColumnName']].astype(float)
     filtered = pandas.DataFrame(
-        data={'@ID': idColumn, '@dDevdCasZpravy': timeColumn, '@iDevdAverageCurrent': averageColumn})
+        data={desiredColumns['idColumnName']: idColumn, desiredColumns['timeColumnName']: timeColumn, desiredColumns['averageColumnName']: averageColumn})
     return filtered
 
 

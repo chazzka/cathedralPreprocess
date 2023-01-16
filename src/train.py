@@ -1,12 +1,7 @@
-from preprocessing.preprocessing import preprocessCSVData
-from service.request import getCSVData
-from ai.trainer import doTrain, saveModel, findCluster
-
+from preprocessing.preprocessing import preprocess
+from ai.trainer import doTrain, saveModel
 import logging
 import sys
-import pandas
-import matplotlib.pyplot as plt
-import numpy as np
 
 from datetime import datetime, timedelta
 
@@ -31,18 +26,27 @@ if __name__ == "__main__":
     # posturl = 'https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst'
     posturl = sys.argv[5]
 
-    body = {"_parameters": ["iot_device_data", "", 0,
-                            f"/sDeviceIdLst:\"3\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=daystostrip)}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
+    idColumnName = sys.argv[6]  # @ID
+    averageColumnName = sys.argv[7]  # @iDevdAverageCurrent
+    timeColumnName = sys.argv[8]  # @dDevdCasZpravy
+    apiDataIndentifier = sys.argv[9]  # iot_device_data
+    deviceIdLst = sys.argv[10]  # 3
+
+    newModelName = sys.argv[11]
+
+    body = {"_parameters": [apiDataIndentifier, "", 0,
+                            f"/sDeviceIdLst:\"{deviceIdLst}\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=daystostrip)}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
     auth = (username, password)
 
-    averageColumnName = "@iDevdAverageCurrent"
-    timeColumnName = "@dDevdCasZpravy"
+    desiredColumns = {'idColumnName': idColumnName,
+                      'averageColumnName': averageColumnName, 'timeColumnName': timeColumnName}
 
-    filtered = preprocessCSVData(getCSVData("./data/export.csv"))
+    filtered = preprocess(url, body, auth, desiredColumns)
     # fitting elispoid, take only desired feature
     res = filtered[[averageColumnName]]
     linearTrained = doTrain(res)
-    saveModel(linearTrained)
+    filename = f'{newModelName}.pckl'
+    saveModel(linearTrained, filename)
 
     logging.error("no cluster found")
     sys.exit(1)

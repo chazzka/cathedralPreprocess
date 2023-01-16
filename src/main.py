@@ -22,26 +22,29 @@ if __name__ == "__main__":
     password = sys.argv[2]
     daystostrip = sys.argv[3]
 
-    # url = 'https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst'
     url = sys.argv[4]
-    # posturl = 'https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst'
     posturl = sys.argv[5]
 
-    body = {"_parameters": ["iot_device_data", "", 0,
-                            f"/sDeviceIdLst:\"3\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=daystostrip)}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
+    idColumnName = sys.argv[6]  # @ID
+    averageColumnName = sys.argv[7]  # @iDevdAverageCurrent
+    timeColumnName = sys.argv[8]  # @dDevdCasZpravy
+    apiDataIndentifier = sys.argv[9]  # iot_device_data
+    deviceIdLst = sys.argv[10]  # 3
+    modelPath = sys.argv[11] # models/model.pckl
+
+    body = {"_parameters": [apiDataIndentifier, "", 0,
+                            f"/sDeviceIdLst:\"{deviceIdLst}\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=daystostrip)}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
     auth = (username, password)
 
-    averageColumnName = "@iDevdAverageCurrent"
-    timeColumnName = "@dDevdCasZpravy"
-
-# --------------------------------------
+    desiredColumns = {'idColumnName': idColumnName,
+                      'averageColumnName': averageColumnName, 'timeColumnName': timeColumnName}
 
     # prepare DataFrame with desired columns
-    dataFrame = preprocess(url, body, auth)
+    dataFrame = preprocess(url, body, auth, desiredColumns)
 
     # evaluate model (accept dataframe and model, return trained dataframe)
     predictedDataFrame = predict(
-        dataFrame, timeColumnName, averageColumnName, loadModel('models/model.pckl'))
+        dataFrame, timeColumnName, averageColumnName, loadModel(modelPath))
 
     if predictedDataFrame.empty:
         sys.exit(1)

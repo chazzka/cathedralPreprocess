@@ -78,8 +78,7 @@ def localOutlierTrain(X_train):
     return LocalOutlierFactor(n_neighbors=5, contamination=0.5).fit_predict(X_train)
 
 
-def saveModel(model):
-    filename = 'model.pckl'
+def saveModel(model, filename):
     pickle.dump(model, open(f'models/{filename}', 'wb'))
 
 
