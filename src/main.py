@@ -17,7 +17,9 @@ def getConfigFile(path):
 if __name__ == "__main__":
 
     logging.basicConfig(filename='logs/debug.log',
-                        encoding='utf-8', level=logging.DEBUG)
+                        format='%(asctime)s %(levelname)-8s %(message)s',
+                        encoding='utf-8', level=logging.INFO,
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
     try:
         configFile = sys.argv[1]
