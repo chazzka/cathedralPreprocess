@@ -9,4 +9,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python3", "src/main.py", "./config.toml"]
+CMD ["python3", "-u", "src/main.py", "./config.toml"]

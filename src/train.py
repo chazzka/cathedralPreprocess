@@ -18,7 +18,7 @@ def getConfigFile(path):
 
 if __name__ == "__main__":
 
-    logging.basicConfig(filename='logs/debug.log',
+    logging.basicConfig(filename='./logs/debug.log',
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         encoding='utf-8', level=logging.INFO,
                         datefmt='%Y-%m-%d %H:%M:%S')
@@ -42,4 +42,4 @@ if __name__ == "__main__":
     logging.info(f"saving model {newModelName}")
     saveModel(linearTrained, filename)
 
-    sys.exit(1)
+    sys.exit(0)

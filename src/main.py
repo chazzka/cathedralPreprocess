@@ -16,10 +16,13 @@ def getConfigFile(path):
 
 if __name__ == "__main__":
 
-    logging.basicConfig(filename='logs/debug.log',
+
+    logging.basicConfig(filename='./logs/debug.log',
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         encoding='utf-8', level=logging.INFO,
                         datefmt='%Y-%m-%d %H:%M:%S')
+
+    logging.info("starting script")
 
     try:
         configFile = sys.argv[1]
@@ -57,4 +60,5 @@ if __name__ == "__main__":
     # optional: plot predicted dataframe
     # plotPredictedDataFrame(predictedDataFrame, timeColumnName, averageColumnName)
 
-    sys.exit(1)
+    print("done")
+    sys.exit(0)
