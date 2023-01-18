@@ -1,4 +1,5 @@
-# how to run with python pip:
+required python>=3.9
+# How to run with python pip
 
 source venv/bin/activate
 
@@ -15,34 +16,80 @@ python3 src/main.py myconfig.toml
 python -m unittest test.runtests
 
 
-# training
+# How to run with docker
+
+
+`docker build --network=host --tag cathedral .`
+
+`docker run --network=host cathedral . `
+
+## user defined config toml file
+default config toml file is ./config.toml (specified in Dockerfile)
+
+to change the config.toml path, change in Dockerfile `CMD` argument
+
+`CMD ["python3", "src/main.py", `"./config.toml"`]`
+
+# Output exit codes
+## 0
+script evaluated successfully, sent POST to the desired endpoint
+## 1
+A) no cluster found
+
+B) some unexpected error occurred - see ./logs
+
+
+# Training
 
 training is for creating a new model
 
 traning fits a mathematical model based on the positions of data in the space (time and desired value), this way there is no need for labeled data
 
-use training only if previous trained model is lost or damaged
+use training only if previous trained model is lost or damaged or no longer valid
 
 use training only on the valid dataset
 
-python3 src/train.py login password SUBDAYS getRecrodLstURL updateRecordLstURL idColumn observableColumn timeColumn apiDataIndentifier deviceIdLst
+do not forget to set a name for the new model (see config below)
 
-python3 src/main.py a_ulrich@utb.cz EcCNVU/dS76jpE938WxRHRGmjRM= 1000 https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst @ID @iDevdAverageCurrent @dDevdCasZpravy iot_device_data 3
+`python3 src/train.py config.toml`
 
+## how to train with docker
 
-# how to run with docker
+change Dockerfile CMD to `CMD ["python3", `"src/train.py"`, "./config.toml"]`
 
-## default config toml file
+# Logs
+automatic logging is implemented, default level is `INFO`
 
-`docker build --network=host --tag cathedral .`
+log file can be found in `./logs/debug.log`
 
-## user defined config toml file
+`sudo docker run -it --entrypoint /bin/bash cathedral`
 
-`docker run --network=host cathedral . `
+log format is: `time - level - message`
 
+# config.toml
+input of the script is defined in `config.toml` file
 
+this file can be changed anytime by specifing different toml file in `Dockerfile`
 
+## format:
+./config.toml
 
+```toml
+auth = ["api_username", "api_password"]
 
-# exit code 1
- - no cluster found
+[server]
+url = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst"
+posturl = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst"
+
+[args]
+daystostrip = 1000 # number of days to subtract from NOW()
+idColumnName = "@ID" # name of ID Column
+averageColumnName = "@iDevdAverageCurrent" # name of observed column
+timeColumnName = "@dDevdCasZpravy" # name of time column
+apiDataIndentifier = "iot_device_data" # data identifier form API
+deviceIdLst = 3 # device ID
+modelPath = "models/model.pckl" # where to find trained model
+# only for train.py
+newModelName = "newmodel" # how to name new trained model (saved to models/)
+```
+
