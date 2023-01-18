@@ -2,6 +2,7 @@ from preprocessing.preprocessing import preprocess
 from ai.trainer import doTrain, saveModel
 import logging
 import sys
+import tomli
 
 from datetime import datetime, timedelta
 
@@ -10,43 +11,35 @@ def getCurrentTimeAsDTString(time=datetime.now(), daysSub=0):
     return (time - timedelta(days=int(daysSub))).strftime('%Y-%m-%d %H:%M:%S')
 
 
+def getConfigFile(path):
+    with open(path, mode="rb") as fp:
+        return tomli.load(fp)
+
+
 if __name__ == "__main__":
 
     logging.basicConfig(filename='logs/debug.log',
-                        encoding='utf-8', level=logging.DEBUG)
+                        format='%(asctime)s %(levelname)-8s %(message)s',
+                        encoding='utf-8', level=logging.INFO,
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
-    # TODO: later args
-    username = sys.argv[1]
-    password = sys.argv[2]
+    try:
+        configFile = sys.argv[1]
+    except IndexError:
+        configFile = "config.toml"
 
-    daystostrip = sys.argv[3]
+    config = getConfigFile(configFile)
 
-    # url = 'https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst'
-    url = sys.argv[4]
-    # posturl = 'https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst'
-    posturl = sys.argv[5]
+    averageColumnName = config["args"]["averageColumnName"]  # @iDevdAverageCurrent
+    newModelName = config["args"]["newModelName"]
 
-    idColumnName = sys.argv[6]  # @ID
-    averageColumnName = sys.argv[7]  # @iDevdAverageCurrent
-    timeColumnName = sys.argv[8]  # @dDevdCasZpravy
-    apiDataIndentifier = sys.argv[9]  # iot_device_data
-    deviceIdLst = sys.argv[10]  # 3
-
-    newModelName = sys.argv[11]
-
-    body = {"_parameters": [apiDataIndentifier, "", 0,
-                            f"/sDeviceIdLst:\"{deviceIdLst}\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=daystostrip)}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
-    auth = (username, password)
-
-    desiredColumns = {'idColumnName': idColumnName,
-                      'averageColumnName': averageColumnName, 'timeColumnName': timeColumnName}
-
-    filtered = preprocess(url, body, auth, desiredColumns)
+    filtered = preprocess(config)
     # fitting elispoid, take only desired feature
     res = filtered[[averageColumnName]]
     linearTrained = doTrain(res)
     filename = f'{newModelName}.pckl'
+
+    logging.info(f"saving model {newModelName}")
     saveModel(linearTrained, filename)
 
-    logging.error("no cluster found")
     sys.exit(1)
