@@ -25,7 +25,8 @@ def train(df: pandas.DataFrame, trainingColumnName: str):
 def predict(df: pandas.DataFrame, timeColumnName, averageColumnName, model):
     prediction = model.predict(df[[averageColumnName]])
     predictedDf = df.assign(isAnomaly=prediction)
-    return getClusters(predictedDf, timeColumnName, averageColumnName)
+    return predictedDf
+    #return getClusters(predictedDf, timeColumnName, averageColumnName)
 
 
 def getClusters(df, timeColumnName, averageColumnName):
@@ -46,7 +47,7 @@ def getAnomalies(df):
 
 
 def doTrain(X_train):
-    return ellipticTrain(X_train)
+    return forestTrain(X_train)
 
 
 def findCluster(X_Train):

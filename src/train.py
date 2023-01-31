@@ -1,8 +1,10 @@
-from preprocessing.preprocessing import preprocess
+from preprocessing.preprocessing import preprocess, preprocessCSVData
 from ai.trainer import doTrain, saveModel
 import logging
 import sys
 import tomli
+
+import pandas as pd
 
 from datetime import datetime, timedelta
 
@@ -33,7 +35,8 @@ if __name__ == "__main__":
     averageColumnName = config["args"]["averageColumnName"]  # @iDevdAverageCurrent
     newModelName = config["args"]["newModelName"]
 
-    filtered = preprocess(config)
+    # filtered = preprocess(config)
+    filtered = preprocessCSVData(pd.read_csv('data/export.csv'))
     # fitting elispoid, take only desired feature
     res = filtered[[averageColumnName]]
     linearTrained = doTrain(res)
