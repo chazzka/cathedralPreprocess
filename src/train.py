@@ -37,8 +37,10 @@ if __name__ == "__main__":
 
     # filtered = preprocess(config)
     filtered = preprocessCSVData(pd.read_csv('data/export.csv'))
+    print('filtered')
+    print(filtered)
     # fitting elispoid, take only desired feature
-    res = filtered[[averageColumnName]]
+    res = filtered[['@dDevdCasZpravy', averageColumnName]]
     linearTrained = doTrain(res)
     filename = f'{newModelName}.pckl'
 

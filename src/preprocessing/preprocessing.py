@@ -41,10 +41,12 @@ def preprocessAPIDataFrame(data: pandas.DataFrame, configArgs):
 
 
 def preprocessCSVData(data: pandas.DataFrame):
-    filtered = data[(data.ID_iot_device == 3) & (
-        data['@iDevdAverageCurrent'] != 0)]
+    filtered = data.dropna(subset=['@iDevdAverageCurrent'])
+    filtered = filtered[(filtered['@iDevdAverageCurrent'] != 0)]
+
     filtered['@dDevdCasZpravy'] = filtered['@dDevdCasZpravy'].apply(
         CSVDateTimeToMilliseconds)
+    print(filtered)
     return filtered
 
 

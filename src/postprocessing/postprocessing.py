@@ -1,6 +1,7 @@
 from service.request import fetchToJsonWithHeaders
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
+from sklearn.inspection import DecisionBoundaryDisplay
 
 CLUSTER_BOOL_COLUMN = "isCluster"
 
@@ -51,7 +52,8 @@ def plotPredictedDataFrame(df, timeColumnName, averageColumnName):
                 yesCluster[averageColumnName], label='cluster of anomalies')
     ax1.scatter(noCluster[timeColumnName],
                 noCluster[averageColumnName], label='correct')
-    plt.legend(loc='upper left')
+    plt.legend(loc='upper center')
     ax1.set_xlabel("Time")
     ax1.set_ylabel("Observed value")
     plt.show()
+

@@ -23,7 +23,7 @@ def train(df: pandas.DataFrame, trainingColumnName: str):
 
 # accept trained model and dataframe, return dataframe with predicted values
 def predict(df: pandas.DataFrame, timeColumnName, averageColumnName, model):
-    prediction = model.predict(df[[averageColumnName]])
+    prediction = model.predict(df[[timeColumnName,averageColumnName]])
     predictedDf = df.assign(isAnomaly=prediction)
     return predictedDf
     #return getClusters(predictedDf, timeColumnName, averageColumnName)
@@ -63,7 +63,9 @@ def findClusterKMeans(X_train):
 
 
 def forestTrain(X_train):
-    clf = IsolationForest(max_samples=10, contamination=0.07, random_state=0)
+    print("FOREST TRRAIN")
+    print(X_train)
+    clf = IsolationForest(random_state=0)
     return clf.fit(X_train)
 
 
