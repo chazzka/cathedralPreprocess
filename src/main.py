@@ -57,7 +57,7 @@ if __name__ == "__main__":
     res = fetchToJsonWithHeaders(config["server"]["posturl"], tuple(auth), data)
 
     # optional: plot predicted dataframe
-    plotPredictedDataFrame(predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
+    # plotPredictedDataFrame(predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
 
     print("done")
     sys.exit(0)
