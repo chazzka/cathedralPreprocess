@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # prepare DataFrame with desired columns
 
     #dataFrame = preprocess(config)
-    dataFrame = preprocessCSVData(pd.read_csv('data/export.csv'))
+    dataFrame = preprocessCSVData(pd.read_csv('data/isolation_less.csv'))
 
     # evaluate model (accept dataframe and model, return trained dataframe)
     predictedDataFrame = predict(

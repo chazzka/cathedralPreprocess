@@ -49,10 +49,10 @@ def plotPredictedDataFrame(df, timeColumnName, averageColumnName):
     noCluster = df[(df.isAnomaly == 1)]
 
     ax1.scatter(yesCluster[timeColumnName],
-                yesCluster[averageColumnName], label='cluster of anomalies')
+                yesCluster[averageColumnName], label='ano')
     ax1.scatter(noCluster[timeColumnName],
-                noCluster[averageColumnName], label='correct')
-    plt.legend(loc='upper center')
+                noCluster[averageColumnName], label='no')
+    plt.legend(loc='upper left')
     ax1.set_xlabel("Time")
     ax1.set_ylabel("Observed value")
     plt.show()

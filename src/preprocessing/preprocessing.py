@@ -44,8 +44,7 @@ def preprocessCSVData(data: pandas.DataFrame):
     filtered = data.dropna(subset=['@iDevdAverageCurrent'])
     filtered = filtered[(filtered['@iDevdAverageCurrent'] != 0)]
 
-    filtered['@dDevdCasZpravy'] = filtered['@dDevdCasZpravy'].apply(
-        CSVDateTimeToMilliseconds)
+    filtered['@dDevdCasZpravy'] = filtered['@dDevdCasZpravy']
     print(filtered)
     return filtered
 

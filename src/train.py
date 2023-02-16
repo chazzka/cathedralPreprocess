@@ -36,7 +36,7 @@ if __name__ == "__main__":
     newModelName = config["args"]["newModelName"]
 
     # filtered = preprocess(config)
-    filtered = preprocessCSVData(pd.read_csv('data/export.csv'))
+    filtered = preprocessCSVData(pd.read_csv('data/isolation_less.csv'))
     print('filtered')
     print(filtered)
     # fitting elispoid, take only desired feature
