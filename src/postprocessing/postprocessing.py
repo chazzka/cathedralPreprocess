@@ -13,7 +13,6 @@ def postprocess(df, config):
     rows = prepareListOfRows(
         df, config["args"]["idColumnName"], CLUSTER_BOOL_COLUMN)
     
-    print(f"len of rows is {len(rows)}")
 
     x = prepareRowsXML(rows)
     return res['result'][2].replace(
