@@ -1,6 +1,6 @@
 # config.toml
 
-auth = ["api_username", "api_password"]
+auth = ["a_ulrich@utb.cz", "EcCNVU/dS76jpE938WxRHRGmjRM="]
 
 
 [server]

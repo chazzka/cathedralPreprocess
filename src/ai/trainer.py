@@ -30,6 +30,7 @@ def predict(df: pandas.DataFrame, timeColumnName, averageColumnName, model):
 
 def getClusters(df, timeColumnName, averageColumnName):
     anomalies = getAnomalies(df)
+    nonAnomalies = getNonAnomalies(df)
 
     try:
         cluster = findCluster(anomalies[[timeColumnName, averageColumnName]])
@@ -37,12 +38,17 @@ def getClusters(df, timeColumnName, averageColumnName):
         logging.error("no cluster found")
         return pandas.DataFrame()
 
-    # here might be better to assign to the previous df, not only anomalies
-    return anomalies.assign(isCluster=cluster)
+    # non anomalies are non clusters (1 = noCluster)
+    return pandas.concat([anomalies.assign(isCluster=cluster), nonAnomalies.assign(isCluster=1)])
+    #return pandas.concat([anomalies.assign(isCluster=cluster)])
 
 
 def getAnomalies(df):
     return df[(df.isAnomaly == -1)]
+
+
+def getNonAnomalies(df):
+    return df[(df.isAnomaly == 1)]
 
 
 def doTrain(X_train):

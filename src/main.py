@@ -37,6 +37,8 @@ if __name__ == "__main__":
 
     dataFrame = preprocess(config)
 
+
+    print(len(dataFrame))
     # evaluate model (accept dataframe and model, return trained dataframe)
     predictedDataFrame = predict(
         dataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"], loadModel(config["args"]["modelPath"]))
@@ -44,6 +46,7 @@ if __name__ == "__main__":
     if predictedDataFrame.empty:
         sys.exit(1)
 
+    print(predictedDataFrame)
     # postprocess - accept dataframe
     logging.info("starting postprocessing")
 
@@ -51,14 +54,13 @@ if __name__ == "__main__":
         predictedDataFrame, config)
 
     logging.info(postprocessed)
-
+    print(postprocessed)
     # send result
-    data = {"_parameters": [config["args"]["apiDataIndentifier"], "", 0]}
-    res = fetchToJsonWithHeaders(
-        config["server"]["posturl"], tuple(auth), data)
+    #data = {"_parameters": [config["args"]["apiDataIndentifier"], "", 0]}
+    #res = fetchToJsonWithHeaders(config["server"]["posturl"], tuple(auth), data)
 
     # optional: plot predicted dataframe
-    # plotPredictedDataFrame(predictedDataFrame, timeColumnName, averageColumnName)
+    plotPredictedDataFrame(predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
 
     print("done")
     sys.exit(0)

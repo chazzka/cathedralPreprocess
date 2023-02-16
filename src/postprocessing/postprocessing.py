@@ -12,6 +12,8 @@ def postprocess(df, config):
 
     rows = prepareListOfRows(
         df, config["args"]["idColumnName"], CLUSTER_BOOL_COLUMN)
+    
+    print(f"len of rows is {len(rows)}")
 
     x = prepareRowsXML(rows)
     return res['result'][2].replace(
@@ -33,7 +35,7 @@ def prepareListOfRows(df, idColumn, clusterBoolColumn):
 
 
 def prepareRowXML(row: Row):
-    return f'<ROW ID=\"{row.id}\" bDevdAvgCurrentAnomaly=\"{bool(row.bDevdAvgCurrentAnomaly)}\"/>'
+    return f'<ROW ID=\"{row.id}\" bDevdAvgCurrentAnomaly=\"{not bool(row.bDevdAvgCurrentAnomaly)}\"/>'
 
 
 def prepareRowsXML(idAnomalyDics: list[Row]):
