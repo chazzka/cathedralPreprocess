@@ -53,8 +53,8 @@ if __name__ == "__main__":
 
     logging.info(postprocessed)
     # send result
-    #data = {"_parameters": [config["args"]["apiDataIndentifier"], "", 0]}
-    #res = fetchToJsonWithHeaders(config["server"]["posturl"], tuple(auth), data)
+    data = {"_parameters": [config["args"]["apiDataIndentifier"], "", 0]}
+    res = fetchToJsonWithHeaders(config["server"]["posturl"], tuple(auth), data)
 
     # optional: plot predicted dataframe
     plotPredictedDataFrame(predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
