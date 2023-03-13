@@ -1,8 +1,5 @@
 import pandas
 import json
-
-import xml.etree.ElementTree as ET
-
 import requests
 import logging
 

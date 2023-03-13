@@ -5,13 +5,9 @@ import matplotlib.pyplot as plt
 CLUSTER_BOOL_COLUMN = "isCluster"
 
 
-def postprocess(df, config):
-    data = {"_parameters": [config["args"]["apiDataIndentifier"], "", 0]}
-    res = fetchToJsonWithHeaders(
-        config["server"]["url"], tuple(config["auth"]), data)
-
+def postprocess(df, argsConfig, res):
     rows = prepareListOfRows(
-        df, config["args"]["idColumnName"], CLUSTER_BOOL_COLUMN)
+        df, argsConfig["idColumnName"], CLUSTER_BOOL_COLUMN)
     
 
     x = prepareRowsXML(rows)

@@ -1,6 +1,6 @@
 import logging
 
-from preprocessing.preprocessing import preprocess
+from preprocessing.preprocessing import preprocess, getCurrentTimeAsDTString
 from ai.trainer import loadModel, predict
 from postprocessing.postprocessing import postprocess, plotPredictedDataFrame
 from service.request import fetchToJsonWithHeaders
@@ -14,8 +14,37 @@ def getConfigFile(path):
         return tomli.load(fp)
 
 
-if __name__ == "__main__":
+def fetchDataToDict(serverConfig):
+    data = {"_parameters": [serverConfig['apiDataIndentifier'], "", 0,
+                            f"/sDeviceIdLst:\"{serverConfig['deviceIdLst']}\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=serverConfig['daystostrip'])}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
 
+    res = fetchToJsonWithHeaders(
+        serverConfig["url"], tuple(serverConfig["auth"]), data)
+    return res
+
+
+def postData(df, config, shouldSend=False):
+    logging.info("starting postprocessing")
+    data = {"_parameters": [config["server"]["apiDataIndentifier"], "", 0]}
+    res = fetchToJsonWithHeaders(
+        config["server"]["url"], tuple(config["server"]["auth"]), data)
+
+    postprocessed = postprocess(df, config["args"], res)
+
+    logging.info(postprocessed)
+
+    # send result POST
+    data = {"_parameters": [config["server"]
+                            ["apiDataIndentifier"], postprocessed, 0]}
+
+    if shouldSend:
+        fetchToJsonWithHeaders(
+            config["server"]["posturl"], tuple(config["server"]["auth"]), data)
+
+    return postprocessed
+
+
+if __name__ == "__main__":
 
     logging.basicConfig(filename='./logs/debug.log',
                         format='%(asctime)s %(levelname)-8s %(message)s',
@@ -31,12 +60,9 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-    auth = config["auth"]
-
     # prepare DataFrame with desired columns
 
-    dataFrame = preprocess(config)
-
+    dataFrame = preprocess(fetchDataToDict(config["server"]), config["args"])
 
     # evaluate model (accept dataframe and model, return trained dataframe)
     predictedDataFrame = predict(
@@ -46,18 +72,12 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # postprocess - accept dataframe
-    logging.info("starting postprocessing")
 
-    postprocessed = postprocess(
-        predictedDataFrame, config)
-
-    logging.info(postprocessed)
-    # send result
-    data = {"_parameters": [config["args"]["apiDataIndentifier"], postprocessed, 0]}
-    res = fetchToJsonWithHeaders(config["server"]["posturl"], tuple(auth), data)
+    postData(predictedDataFrame, config, False)
 
     # optional: plot predicted dataframe
-    # plotPredictedDataFrame(predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
+    plotPredictedDataFrame(
+        predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
 
     print("done")
     sys.exit(0)

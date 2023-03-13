@@ -40,7 +40,7 @@ def getClusters(df, timeColumnName, averageColumnName):
 
     # non anomalies are non clusters (1 = noCluster)
     return pandas.concat([anomalies.assign(isCluster=cluster), nonAnomalies.assign(isCluster=1)])
-    #return pandas.concat([anomalies.assign(isCluster=cluster)])
+    # return pandas.concat([anomalies.assign(isCluster=cluster)])
 
 
 def getAnomalies(df):
@@ -64,7 +64,8 @@ def findClusterDBScan(X_train):
 
 
 def findClusterKMeans(X_train):
-    return KMeans(n_clusters=2, random_state=0, n_init="auto", algorithm="elkan").fit_predict(X_train)
+    # TODO: ONE CLUSTER
+    return KMeans(n_clusters=1, random_state=0, n_init="auto", algorithm="lloyd").fit_predict(X_train)
 
 
 def forestTrain(X_train):

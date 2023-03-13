@@ -1,13 +1,8 @@
 import pandas
 from datetime import datetime
-from dataclasses import dataclass
 import xmltodict as xtd
-from service.request import fetchToJsonWithHeaders
-
 import logging
 from datetime import datetime, timedelta
-
-import sys
 
 
 def getNumberEight():
@@ -18,16 +13,10 @@ def getCurrentTimeAsDTString(time=datetime.now(), daysSub=0):
     return (time - timedelta(days=int(daysSub))).strftime('%Y-%m-%d %H:%M:%S')
 
 
-def preprocess(config) -> pandas.DataFrame:
-    args = config["args"]
-    data = {"_parameters": [args['apiDataIndentifier'], "", 0,
-                            f"/sDeviceIdLst:\"{args['deviceIdLst']}\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=args['daystostrip'])}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
 
-    res = fetchToJsonWithHeaders(
-        config["server"]["url"], tuple(config["auth"]), data)
-
-    dataFrameRes = convertToDF(res)
-    return preprocessAPIDataFrame(dataFrameRes, args)
+def preprocess(data: dict, configArgs) -> pandas.DataFrame:
+    dataFrameRes = convertToDF(data)
+    return preprocessAPIDataFrame(dataFrameRes, configArgs)
 
 
 def preprocessAPIDataFrame(data: pandas.DataFrame, configArgs):
