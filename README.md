@@ -1,3 +1,8 @@
+This project takes the trained model (which should know how regular data look like - see `traning`), based on it, it finds the anomalies and tries to find a cluster amongst them. Report is sent to desired endpoint.
+
+- finding anomalies is `supervised` - traning needs to be run first to tell the model how do anomalies look
+- finding clusters is `unsupervised` - based on anomalies (trained model), script can automatically find clusters
+
 # How to run with python pip
 required python>=3.9
 
@@ -33,7 +38,7 @@ docker build --network=host --tag cathedral .
 ```
 
 ```
-docker run --network=host cathedral . 
+docker run --network=host cathedral
 ```
 
 ## user defined config toml file
@@ -42,7 +47,7 @@ default config toml file is `./config.toml` (specified in Dockerfile)
 to change the config.toml path, change in Dockerfile `CMD` argument
 
 ```Dockerfile
-CMD ["python3", "src/main.py", `"./config.toml"`]
+CMD ["PYTHONPATH=$PYTHONPATH:./src python3", "src/main.py", "./config.toml"]
 ```
 
 # Output exit codes
@@ -102,21 +107,30 @@ deviceIdLst = 3 # device ID
 modelPath = "models/model.pckl" # where to find trained model
 # only for train.py
 newModelName = "newmodel" # how to name new trained model (saved to models/)
+
+[AI]
+contamination = 0.02 # (0, 0.5> The amount of contamination for traning of the data set, i.e. the proportion of outliers in the data set. (see training)
+eps = 7 # float, The maximum distance between two samples for one to be considered as in the neighborhood of the other
+min_samples = 10 # int, The number of samples in a neighborhood for a point to be considered as a cluster point. This includes the point itself.
 ```
 
 # Training
 
-training is for creating a new model
+- for creating a new model to filter out anomalies
 
-traning fits a mathematical model based on the positions of data in the space (time and desired value), this way there is no need for labeled data
+Traning fits a mathematical model based on the positions of data in the space (time and desired value).
 
-use training only if previous trained model is lost or damaged or no longer valid
+Use training only if previous trained model is lost or damaged or no longer valid.
 
-use training only on the valid dataset
+We use traning on the dataset with valid data, to teach the model how do valid data look.
 
-do not forget to set a name for the new model (see config above)
+Dataset should not contain anomalies, if it does in some small amount, define the percentage using `contamination` parametr in the config file.
+
+Default `contamination` is set to 0.02 (=2%) to allow some disturbances.
+
+- do not forget to set a name for the new model (see config above)
 ```sh
-python3 src/train.py config.toml
+python3 bin/train.py config.toml
 ```
 
 ## how to train with docker
@@ -124,5 +138,5 @@ python3 src/train.py config.toml
 change Dockerfile CMD to 
 
 ```Dockerfile
-CMD ["python3", "src/train.py", "./config.toml"]
+CMD ["PYTHONPATH=$PYTHONPATH:./src python3", "bin/train.py", "./config.toml"]
 ```

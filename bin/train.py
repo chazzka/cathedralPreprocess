@@ -3,6 +3,8 @@ from ai.trainer import doTrain, saveModel
 import logging
 import sys
 import tomli
+from service.request import fetchDataToDict
+from mock.randomdatagenerator import createRandomDataFrame
 
 from datetime import datetime, timedelta
 
@@ -14,6 +16,13 @@ def getCurrentTimeAsDTString(time=datetime.now(), daysSub=0):
 def getConfigFile(path):
     with open(path, mode="rb") as fp:
         return tomli.load(fp)
+
+
+def getModel(data: dict, configArgs, aiArgs):
+    #dataFrame = preprocess(data, configArgs)
+    dataFrame = data
+    features = dataFrame[[configArgs["timeColumnName"], configArgs["averageColumnName"]]].values.tolist()
+    return doTrain(features, aiArgs)
 
 
 if __name__ == "__main__":
@@ -30,16 +39,12 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-    averageColumnName = config["args"]["averageColumnName"]  # @iDevdAverageCurrent
-    newModelName = config["args"]["newModelName"]
+    data = fetchDataToDict(config["server"])
 
-    filtered = preprocess(config)
-    # fitting elispoid, take only desired feature
-    res = filtered[[averageColumnName]]
-    linearTrained = doTrain(res)
-    filename = f'{newModelName}.pckl'
+    data = createRandomDataFrame(config)
 
-    logging.info(f"saving model {newModelName}")
-    saveModel(linearTrained, filename)
+    linearModel = getModel(data, config["args"], config["AI"])
+
+    saveModel(linearModel, f"{config['args']['newModelName']}.pckl")
 
     sys.exit(0)

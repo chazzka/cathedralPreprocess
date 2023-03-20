@@ -3,7 +3,7 @@ import logging
 from preprocessing.preprocessing import preprocess, getCurrentTimeAsDTString
 from ai.trainer import loadModel, predict
 from postprocessing.postprocessing import postprocess, plotPredictedDataFrame
-from service.request import fetchToJsonWithHeaders
+from service.request import fetchToJsonWithHeaders, fetchDataToDict
 
 import sys
 import tomli
@@ -14,22 +14,13 @@ def getConfigFile(path):
         return tomli.load(fp)
 
 
-def fetchDataToDict(serverConfig):
-    data = {"_parameters": [serverConfig['apiDataIndentifier'], "", 0,
-                            f"/sDeviceIdLst:\"{serverConfig['deviceIdLst']}\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=serverConfig['daystostrip'])}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
-
-    res = fetchToJsonWithHeaders(
-        serverConfig["url"], tuple(serverConfig["auth"]), data)
-    return res
-
-
-def postData(df, config, shouldSend=False):
+def postData(predictedDataFrame, config, shouldSend=False):
     logging.info("starting postprocessing")
     data = {"_parameters": [config["server"]["apiDataIndentifier"], "", 0]}
     res = fetchToJsonWithHeaders(
         config["server"]["url"], tuple(config["server"]["auth"]), data)
 
-    postprocessed = postprocess(df, config["args"], res)
+    postprocessed = postprocess(predictedDataFrame, config["args"], res)
 
     logging.info(postprocessed)
 
@@ -40,6 +31,9 @@ def postData(df, config, shouldSend=False):
     if shouldSend:
         fetchToJsonWithHeaders(
             config["server"]["posturl"], tuple(config["server"]["auth"]), data)
+    else:
+        plotPredictedDataFrame(
+            predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
 
     return postprocessed
 
@@ -60,24 +54,15 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-    # prepare DataFrame with desired columns
-
-    dataFrame = preprocess(fetchDataToDict(config["server"]), config["args"])
-
     # evaluate model (accept dataframe and model, return trained dataframe)
     predictedDataFrame = predict(
-        dataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"], loadModel(config["args"]["modelPath"]))
-
-    if predictedDataFrame.empty:
-        sys.exit(1)
-
-    # postprocess - accept dataframe
+        preprocess(fetchDataToDict(config["server"]), config["args"]), 
+        config["args"]["timeColumnName"], 
+        config["args"]["averageColumnName"], 
+        loadModel(config["args"]["modelPath"]), 
+        config["AI"])
 
     postData(predictedDataFrame, config, False)
-
-    # optional: plot predicted dataframe
-    plotPredictedDataFrame(
-        predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
 
     print("done")
     sys.exit(0)

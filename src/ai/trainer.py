@@ -7,40 +7,39 @@ from sklearn.covariance import EllipticEnvelope
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import KMeans
+from sklearn.linear_model import SGDOneClassSVM
 
 
 import pickle
 import pandas
 import logging
 
-# accept dataframe, return trained model
-
-
-def train(df: pandas.DataFrame, trainingColumnName: str):
-    trainingData = df[[trainingColumnName]]
-    labels = ellipticTrain(trainingData)
 
 
 # accept trained model and dataframe, return dataframe with predicted values
-def predict(df: pandas.DataFrame, timeColumnName, averageColumnName, model):
-    prediction = model.predict(df[[averageColumnName]])
+def predict(df: pandas.DataFrame, timeColumnName, averageColumnName, model, aiArgs):
+    # without feature names
+    prediction = model.predict(df[[timeColumnName, averageColumnName]].values.tolist())
+
     predictedDf = df.assign(isAnomaly=prediction)
-    return getClusters(predictedDf, timeColumnName, averageColumnName)
+    
+    return getClusters(predictedDf, timeColumnName, averageColumnName, aiArgs)
 
 
-def getClusters(df, timeColumnName, averageColumnName):
+def getClusters(df, timeColumnName, averageColumnName, aiArgs):
     anomalies = getAnomalies(df)
     nonAnomalies = getNonAnomalies(df)
 
     try:
-        cluster = findCluster(anomalies[[timeColumnName, averageColumnName]])
+        cluster = findCluster(anomalies[[timeColumnName, averageColumnName]], aiArgs)
+        allClustersTogether = [0 if c>=0 else 1 for c in cluster]
+        return pandas.concat([anomalies.assign(isCluster=allClustersTogether), nonAnomalies.assign(isCluster=1)])
     except:
         logging.error("no cluster found")
-        return pandas.DataFrame()
 
-    # non anomalies are non clusters (1 = noCluster)
-    return pandas.concat([anomalies.assign(isCluster=cluster), nonAnomalies.assign(isCluster=1)])
-    # return pandas.concat([anomalies.assign(isCluster=cluster)])
+    # if no cluster found, return all as OK
+    return pandas.concat([anomalies.assign(isCluster=1), nonAnomalies.assign(isCluster=1)])
+
 
 
 def getAnomalies(df):
@@ -51,41 +50,50 @@ def getNonAnomalies(df):
     return df[(df.isAnomaly == 1)]
 
 
-def doTrain(X_train):
-    return ellipticTrain(X_train)
+def doTrain(X_train, aiArgs):
+    return forestTrain(X_train, aiArgs["contamination"])
+
+# 1 - not a cluster
+# 0 - is a cluster
+def findCluster(X_Train, aiArgs):
+    return findClusterDBScan(X_Train, aiArgs["eps"], aiArgs["min_samples"])
 
 
-def findCluster(X_Train):
-    return findClusterKMeans(X_Train)
-
-
-def findClusterDBScan(X_train):
-    return DBSCAN(eps=0.5, min_samples=10).fit_predict(X_train)
+def findClusterDBScan(X_train, eps=7, min_samples=10):
+    return DBSCAN(eps=eps, min_samples=min_samples).fit_predict(X_train)
 
 
 def findClusterKMeans(X_train):
-    # TODO: ONE CLUSTER
-    return KMeans(n_clusters=1, random_state=0, n_init="auto", algorithm="lloyd").fit_predict(X_train)
+    return KMeans(n_clusters=2, random_state=0, n_init="auto", algorithm="lloyd").fit_predict(X_train)
 
 
-def forestTrain(X_train):
-    clf = IsolationForest(max_samples=10, contamination=0.07, random_state=0)
+def forestTrain(X_train, contamination=0.02):
+    clf = IsolationForest(max_samples='auto', random_state=0, contamination=contamination)
     return clf.fit(X_train)
 
 
 def svmTrain(X_train):
-    return OneClassSVM(gamma='auto', kernel='linear').fit(X_train)
+    return OneClassSVM(kernel='linear', nu=0.1).fit(X_train)
+
+
+def sdgSvmTrain(X_train):
+    return SGDOneClassSVM().fit(X_train)
 
 
 def ellipticTrain(X_train):
-    return EllipticEnvelope(random_state=0, assume_centered=True, contamination=0.1).fit(X_train)
+    return EllipticEnvelope(random_state=0, assume_centered=False, contamination=0.05).fit(X_train)
+
+
+def ellipticFitPredict(X_train):
+    return EllipticEnvelope(random_state=0, assume_centered=False, contamination=0.1).fit_predict(X_train)
 
 
 def localOutlierTrain(X_train):
-    return LocalOutlierFactor(n_neighbors=5, contamination=0.5).fit_predict(X_train)
+    return LocalOutlierFactor(novelty=True).fit(X_train)
 
 
 def saveModel(model, filename):
+    logging.info(f"saving model {filename}")
     pickle.dump(model, open(f'models/{filename}', 'wb'))
 
 

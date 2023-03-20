@@ -12,7 +12,15 @@ apiDataIndentifier = "iot_device_data"
 idColumnName = "@ID"
 averageColumnName = "@iDevdAverageCurrent"
 timeColumnName = "@dDevdCasZpravy"
-modelPath = "models/model.pckl"
+modelPath = "models/newmodel.pckl"
 # only for train.py
 newModelName = "newmodel"
+
+# args for AI algorithms, see README for info
+[AI]
+# training - anomalies
+contamination = 0.02
+# running - clusters
+eps = 7
+min_samples = 10
 

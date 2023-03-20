@@ -49,4 +49,6 @@ def plotPredictedDataFrame(df, timeColumnName, averageColumnName):
     ax1.scatter(noCluster[timeColumnName],
                 noCluster[averageColumnName], label='correct')
     plt.legend(loc='upper left')
+    plt.xlabel("Time")
+    plt.ylabel("Observed value")
     plt.show()

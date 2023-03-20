@@ -9,4 +9,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python3", "-u", "src/main.py", "./config.toml"]
+#CMD ["python3", "-u", "src/main.py", "./config.toml"]
+ENV PYTHONPATH "${PYTHONPATH}:./src"
+CMD ["python3", "-u", "bin/main.py", "./config.toml"]

@@ -2,7 +2,19 @@ import pandas
 import json
 import requests
 import logging
+from preprocessing.preprocessing import getNumberEight, getCurrentTimeAsDTString
 
+def some():
+    return 5 + getNumberEight()
+
+
+def fetchDataToDict(serverConfig):
+    data = {"_parameters": [serverConfig['apiDataIndentifier'], "", 0,
+                            f"/sDeviceIdLst:\"{serverConfig['deviceIdLst']}\" /dDTFr:\"{getCurrentTimeAsDTString(daysSub=serverConfig['daystostrip'])}\" /dDTTo:\"{getCurrentTimeAsDTString()}\""]}
+
+    res = fetchToJsonWithHeaders(
+        serverConfig["url"], tuple(serverConfig["auth"]), data)
+    return res
 
 def getCSVData(source: str) -> pandas.DataFrame:
     return pandas.read_csv(source, usecols=['ID', '@dDevdCasZpravy', 'ID_iot_device', '@iDevdAverageCurrent'])
