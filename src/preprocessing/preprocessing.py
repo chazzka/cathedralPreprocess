@@ -102,6 +102,6 @@ def convertToPrettyDict(json: dict) -> list[dict]:
 
     try:
         return xmlres['DATAPACKET']['ROWDATA']['ROW']
-    except IndexError:
+    except:
         logging.error("No data found in json from API.")
-        return {}
+        sys.exit(1)

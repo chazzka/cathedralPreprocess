@@ -4,6 +4,7 @@ import requests
 import logging
 from preprocessing.preprocessing import getNumberEight, getCurrentTimeAsDTString
 
+
 def some():
     return 5 + getNumberEight()
 
@@ -15,6 +16,7 @@ def fetchDataToDict(serverConfig):
     res = fetchToJsonWithHeaders(
         serverConfig["url"], tuple(serverConfig["auth"]), data)
     return res
+
 
 def getCSVData(source: str) -> pandas.DataFrame:
     return pandas.read_csv(source, usecols=['ID', '@dDevdCasZpravy', 'ID_iot_device', '@iDevdAverageCurrent'])

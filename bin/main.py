@@ -1,8 +1,8 @@
 import logging
 
 from preprocessing.preprocessing import preprocess, getCurrentTimeAsDTString
-from ai.trainer import loadModel, predict
-from postprocessing.postprocessing import postprocess, plotPredictedDataFrame
+from ai.trainer import loadModel, predict, getClusters
+from postprocessing.postprocessing import postprocess, plotXyWithPredicted
 from service.request import fetchToJsonWithHeaders, fetchDataToDict
 
 import sys
@@ -14,28 +14,32 @@ def getConfigFile(path):
         return tomli.load(fp)
 
 
-def postData(predictedDataFrame, config, shouldSend=False):
-    logging.info("starting postprocessing")
-    data = {"_parameters": [config["server"]["apiDataIndentifier"], "", 0]}
-    res = fetchToJsonWithHeaders(
-        config["server"]["url"], tuple(config["server"]["auth"]), data)
-
-    postprocessed = postprocess(predictedDataFrame, config["args"], res)
-
-    logging.info(postprocessed)
-
-    # send result POST
-    data = {"_parameters": [config["server"]
-                            ["apiDataIndentifier"], postprocessed, 0]}
+def postData(xyArray, predicted, dataFromApi, config, shouldSend=False):
 
     if shouldSend:
+        data = {"_parameters": [config["server"]["apiDataIndentifier"], "", 0]}
+
+        headers = fetchToJsonWithHeaders(
+            config["server"]["url"], tuple(config["server"]["auth"]), data
+        )
+
+        postprocessed = postprocess(
+            map(lambda x: x[config["args"]["idColumnName"]], dataFromApi),
+            map(lambda x: x != -1 or 1, predicted), headers
+        )
+
+        print(postprocessed)
+        sys.exit(1)
+        # send result POST
+        data = {"_parameters": [config["server"]
+                                ["apiDataIndentifier"], postprocessed, 0]}
+
         fetchToJsonWithHeaders(
             config["server"]["posturl"], tuple(config["server"]["auth"]), data)
     else:
-        plotPredictedDataFrame(
-            predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
+        plotXyWithPredicted(xyArray, predicted)
 
-    return postprocessed
+    return 0
 
 
 if __name__ == "__main__":
@@ -54,15 +58,27 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-    # evaluate model (accept dataframe and model, return trained dataframe)
-    predictedDataFrame = predict(
-        preprocess(fetchDataToDict(config["server"]), config["args"]), 
-        config["args"]["timeColumnName"], 
-        config["args"]["averageColumnName"], 
-        loadModel(config["args"]["modelPath"]), 
-        config["AI"])
+    dataFromApi = fetchDataToDict(config["server"])
 
-    postData(predictedDataFrame, config, False)
+    preprocessedDict = preprocess(dataFromApi, config["args"])
+
+    xyTupleList = list(map(lambda x: (
+        x[config["args"]["timeColumnName"]], x[config["args"]["averageColumnName"]]), preprocessedDict))
+
+    # evaluate model (accept dataframe and model, return trained dataframe)
+    predictedIterator = predict(
+        xyTupleList,
+        loadModel(config["args"]["modelPath"]),
+    )
+
+    clusters = getClusters(xyTupleList, predictedIterator, config["AI"])
+
+    # print(len(clusters))
+    print(clusters)
+
+    # TODO: donut je at ti vygeneruji nejake clustery
+
+    postData(xyTupleList, clusters, preprocessedDict, config, False)
 
     print("done")
     sys.exit(0)

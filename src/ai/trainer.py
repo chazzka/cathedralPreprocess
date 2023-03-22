@@ -13,11 +13,12 @@ import pickle
 import logging
 
 
-# accept list of tuples, return predicted array
+# accept list of tuples (x,y), return predicted array
 # returns list[-1=anomalies/1=no anomalies]
-def predict(df: list[tuple], model):
-    # without feature names
-    return model.predict(df)
+def predict(df, model):
+    prediction = model.predict(list(df))
+    # if observed value was 0, assign 1 - no anomaly
+    return map(lambda x,y: x[1] == 0 or y, df, prediction)
 
 
 def getClusters(xyValues, predicted, aiArgs):
@@ -26,20 +27,12 @@ def getClusters(xyValues, predicted, aiArgs):
     return findCluster(xyValues,anomalies,aiArgs)
 
 
-# NO LONGER WORKING
-def getAnomalies(df):
-    return df[(df.isAnomaly == -1)]
-
-
-def getNonAnomalies(df):
-    return df[(df.isAnomaly == 1)]
-
-
 def doTrain(X_train, aiArgs):
     return forestTrain(X_train, aiArgs["contamination"])
 
 # 1 - not a cluster
 # 0 - is a cluster
+# SAMPLE WEIGHT - DB scan can ignore points with minus weight
 def findCluster(X_Train: Sequence[float], sample_weight, aiArgs):
     return findClusterDBScan(X_Train, sample_weight, aiArgs["eps"], aiArgs["min_samples"])
 
