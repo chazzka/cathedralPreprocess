@@ -20,12 +20,12 @@ def getConfigFile(path):
 def getModel(data: dict, configArgs, aiArgs):
     preprocessed = preprocess(data, configArgs)
     
-    # now training is done for non zeros data, evaluating has to be done for all, but zeros will be assigned isAnomaly=0 be default
-    noZeros = filterOutZeros(preprocessed, configArgs)
-    features = map(lambda x: [x[configArgs["timeColumnName"]], x[configArgs["averageColumnName"]]], noZeros)
+    # now training is done for non zeros data
+    features = map(lambda x: [x[configArgs["timeColumnName"]], x[configArgs["averageColumnName"]]], preprocessed)
+    noZeros = filterOutZeros(features, pos=1)
     
-    #[[1,2], [4,5]]
-    return doTrain(list(features), aiArgs)
+    #[[1,2], [4,0]]
+    return doTrain(list(noZeros), aiArgs)
 
 
 if __name__ == "__main__":

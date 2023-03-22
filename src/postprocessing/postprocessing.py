@@ -52,3 +52,15 @@ def plotPredictedDataFrame(df, timeColumnName, averageColumnName):
     plt.xlabel("Time")
     plt.ylabel("Observed value")
     plt.show()
+
+
+def plotXyWithPredicted(xyArray, predicted):
+    fig = plt.figure()
+    ax1 = fig.add_subplot()
+
+    print(xyArray)
+    ax1.scatter(*zip(*xyArray),  c=predicted)
+    plt.legend(loc='upper left')
+    plt.xlabel("Time")
+    plt.ylabel("Observed value")
+    plt.show()

@@ -1,7 +1,7 @@
 from sklearn.datasets import make_blobs, make_regression
 import numpy as np
 import pandas as pd
-from itertools import accumulate
+from itertools import *
 
 
 class Result:
@@ -10,7 +10,7 @@ class Result:
         self.y = y
 
 
-def generateRandomClusters(n_samples=100, centers=[(80, 250)]):
+def generateRandomClusters(n_samples=100, centers=[(80, 250), (20,255)]):
     features, Y1 = make_blobs(
         n_samples=n_samples, n_features=2, centers=centers, cluster_std=7)
     return Result(list(features[:, 0]), list(features[:, 1]))
@@ -21,9 +21,13 @@ def generateLinearSpace(n_samples=500, ymutator=lambda x: 5*x + 100):
     Y, labels = make_regression(n_features=1, n_samples=n_samples)
     return Result(list(X_space), list(map(ymutator, Y.flatten())))
 
-
+# @deprecated
 def generateRandomDataFrame(config, generators: list[Result]):
     return pd.DataFrame({config["args"]["timeColumnName"]: combineListsOfStruct(generators, 'x'), config["args"]["averageColumnName"]: combineListsOfStruct(generators, 'y')})
+
+
+def generateRandomData(generators: list[Result]) -> chain:
+    return chain.from_iterable(map(lambda res: zip(res.x,res.y), generators))
 
 
 def createRandomDataFrame(config):
@@ -32,6 +36,14 @@ def createRandomDataFrame(config):
         generateRandomClusters(),
         generateLinearSpace(),
         generateLinearSpace(20, s)
+    ])
+
+def createRandomData() -> chain:
+    def s(x): return 2*x + 250
+    return generateRandomData([
+        generateRandomClusters(),
+        generateLinearSpace(),
+        generateLinearSpace(20, s),
     ])
 
 

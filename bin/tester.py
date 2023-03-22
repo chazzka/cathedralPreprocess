@@ -1,8 +1,8 @@
 import logging
 
-from ai.trainer import loadModel, predict
-from postprocessing.postprocessing import plotPredictedDataFrame
-from mock.randomdatagenerator import createRandomDataFrame
+from ai.trainer import loadModel, predict, getClusters
+from postprocessing.postprocessing import plotXyWithPredicted
+from mock.randomdatagenerator import createRandomData
 
 import sys
 import tomli
@@ -29,16 +29,15 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-    # evaluate model (accept dataframe and model, return trained dataframe)
-    predictedDataFrame = predict(
-        createRandomDataFrame(config),
-        config["args"]["timeColumnName"],
-        config["args"]["averageColumnName"],
-        loadModel(config["args"]["modelPath"]),
-        config["AI"])
+    xyValues = list(createRandomData())
+    predictedList = predict(
+        xyValues,
+        loadModel(config["args"]["modelPath"])
+    )
 
-    plotPredictedDataFrame(
-            predictedDataFrame, config["args"]["timeColumnName"], config["args"]["averageColumnName"])
+    clusters = getClusters(xyValues, predictedList, config["AI"])
+
+    plotXyWithPredicted(xyValues, clusters)
 
     print("done")
     sys.exit(0)

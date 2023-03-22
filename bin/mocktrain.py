@@ -1,10 +1,10 @@
-from preprocessing.preprocessing import prepareForTrain
+from preprocessing.preprocessing import filterOutZeros
 from ai.trainer import doTrain, saveModel
 import logging
 import sys
 import tomli
 from service.request import fetchDataToDict
-from mock.randomdatagenerator import createRandomDataFrame
+from mock.randomdatagenerator import createRandomData
 
 from datetime import datetime, timedelta
 
@@ -18,11 +18,11 @@ def getConfigFile(path):
         return tomli.load(fp)
 
 
-def getModel(data: dict, configArgs, aiArgs):
-    dataFrame = data
-    noZeros = prepareForTrain(dataFrame, configArgs)
-    features = noZeros[[configArgs["timeColumnName"], configArgs["averageColumnName"]]].values.tolist()
-    return doTrain(features, aiArgs)
+def getModel(iterator, aiArgs):
+    # now training is done for non zeros data
+    noZeros = filterOutZeros(iterator, 1)
+    #[[1,2], [4,5]]
+    return doTrain(list(noZeros), aiArgs)
 
 
 if __name__ == "__main__":
@@ -39,12 +39,11 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-    data = fetchDataToDict(config["server"])
+    # data = fetchDataToDict(config["server"])
 
-    data = createRandomDataFrame(config)
-
-    linearModel = getModel(data, config["args"], config["AI"])
+    linearModel = getModel(createRandomData(), config["AI"])
 
     saveModel(linearModel, f"{config['args']['newModelName']}.pckl")
 
     sys.exit(0)
+

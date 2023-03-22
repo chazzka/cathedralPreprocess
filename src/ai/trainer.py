@@ -1,5 +1,3 @@
-import numpy as np
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from sklearn.ensemble import IsolationForest
 from sklearn.svm import OneClassSVM
@@ -8,40 +6,27 @@ from sklearn.neighbors import LocalOutlierFactor
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import KMeans
 from sklearn.linear_model import SGDOneClassSVM
-
+from typing import Sequence
+from itertools import *
 
 import pickle
-import pandas
 import logging
 
 
-
-# accept trained model and dataframe, return dataframe with predicted values
-def predict(df: pandas.DataFrame, timeColumnName, averageColumnName, model, aiArgs):
+# accept list of tuples, return predicted array
+# returns list[-1=anomalies/1=no anomalies]
+def predict(df: list[tuple], model):
     # without feature names
-    prediction = model.predict(df[[timeColumnName, averageColumnName]].values.tolist())
+    return model.predict(df)
 
-    predictedDf = df.assign(isAnomaly=prediction)
+
+def getClusters(xyValues, predicted, aiArgs):
+    anomalies = map(lambda x: -x, predicted)
     
-    return getClusters(predictedDf, timeColumnName, averageColumnName, aiArgs)
+    return findCluster(xyValues,anomalies,aiArgs)
 
 
-def getClusters(df, timeColumnName, averageColumnName, aiArgs):
-    anomalies = getAnomalies(df)
-    nonAnomalies = getNonAnomalies(df)
-
-    try:
-        cluster = findCluster(anomalies[[timeColumnName, averageColumnName]], aiArgs)
-        allClustersTogether = [0 if c>=0 else 1 for c in cluster]
-        return pandas.concat([anomalies.assign(isCluster=allClustersTogether), nonAnomalies.assign(isCluster=1)])
-    except:
-        logging.error("no cluster found")
-
-    # if no cluster found, return all as OK
-    return pandas.concat([anomalies.assign(isCluster=1), nonAnomalies.assign(isCluster=1)])
-
-
-
+# NO LONGER WORKING
 def getAnomalies(df):
     return df[(df.isAnomaly == -1)]
 
@@ -55,12 +40,12 @@ def doTrain(X_train, aiArgs):
 
 # 1 - not a cluster
 # 0 - is a cluster
-def findCluster(X_Train, aiArgs):
-    return findClusterDBScan(X_Train, aiArgs["eps"], aiArgs["min_samples"])
+def findCluster(X_Train: Sequence[float], sample_weight, aiArgs):
+    return findClusterDBScan(X_Train, sample_weight, aiArgs["eps"], aiArgs["min_samples"])
 
 
-def findClusterDBScan(X_train, eps=7, min_samples=10):
-    return DBSCAN(eps=eps, min_samples=min_samples).fit_predict(X_train)
+def findClusterDBScan(X_train: Sequence[float], sample_weight, eps=7, min_samples=10):
+    return DBSCAN(eps=eps, min_samples=min_samples).fit_predict(list(X_train), sample_weight=list(sample_weight))
 
 
 def findClusterKMeans(X_train):
@@ -68,7 +53,8 @@ def findClusterKMeans(X_train):
 
 
 def forestTrain(X_train, contamination=0.02):
-    clf = IsolationForest(max_samples='auto', random_state=0, contamination=contamination)
+    clf = IsolationForest(max_samples='auto', random_state=0,
+                          contamination=contamination)
     return clf.fit(X_train)
 
 

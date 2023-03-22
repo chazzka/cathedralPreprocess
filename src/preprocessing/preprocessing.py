@@ -14,9 +14,8 @@ def getCurrentTimeAsDTString(time=datetime.now(), daysSub=0):
     return (time - timedelta(days=int(daysSub))).strftime('%Y-%m-%d %H:%M:%S')
 
 
-# for traning, we omit zeros
-def filterOutZeros(preprocessed: list[dict], configArgs):
-    return filter(lambda x: x[configArgs['averageColumnName']] != 0, preprocessed)
+def filterOutZeros(preprocessed, pos):
+    return filter(lambda x: x[pos] != 0, preprocessed)
 
 
 def preprocess(jsondata: dict, configArgs) -> list[dict]:
