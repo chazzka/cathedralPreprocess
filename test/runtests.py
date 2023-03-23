@@ -36,7 +36,6 @@ class TestPreprocessing(unittest.TestCase):
         self.assertEqual(replaceNoKeyWithValue(s, "age", 15.5), res)
 
     def testPreprocessAPIDict(self):
-        # TODO: mrkni jak to chodi z bakcnedu a napiš test aby se ty prázdné hodnoty tady přehodily na 0, None to asi nebude
         s = [{'time': '2016-12-20T09:38:42'}, {'time': '2016-12-20T09:38:42', 'average': '45'}]
         res = [{'time': 1482223122000.0, 'average': 0.0}, {'time': 1482223122000.0, 'average': 45.0}]
 

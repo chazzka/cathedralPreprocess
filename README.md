@@ -47,7 +47,7 @@ default config toml file is `./config.toml` (specified in Dockerfile)
 to change the config.toml path, change in Dockerfile `CMD` argument
 
 ```Dockerfile
-CMD ["PYTHONPATH=$PYTHONPATH:./src python3", "src/main.py", "./config.toml"]
+CMD ["python3", "-u", "bin/main.py", "./config.toml"]
 ```
 
 # Output exit codes
@@ -59,9 +59,10 @@ script evaluated successfully, sent POST to the desired endpoint
 
 
 # Logs
-automatic logging is implemented, default level is `INFO`
-
-log file can be found in `./logs/debug.log`
+automatic logging is implemented
+- logs are separated into two files
+1) logs/debug.log  - contains only error messages
+2) logs/info.log - contains all messages (info AND debug)
 
 ## how to read output from docker container
 
@@ -124,7 +125,7 @@ Use training only if previous trained model is lost or damaged or no longer vali
 
 We use traning on the dataset with valid data, to teach the model how do valid data look.
 
-Dataset should not contain anomalies, if it does in some small amount, define the percentage using `contamination` parametr in the config file.
+Dataset should not contain anomalies, if it does in some small amount, define the percentage using `contamination` parameter in the config file.
 
 Default `contamination` is set to 0.02 (=2%) to allow some disturbances.
 
@@ -140,3 +141,6 @@ change Dockerfile CMD to
 ```Dockerfile
 CMD ["PYTHONPATH=$PYTHONPATH:./src python3", "bin/train.py", "./config.toml"]
 ```
+
+## Logging config file
+Logging config file is a toml file (`loggingconfig.toml`) containing a configuration for logging. The configuration documentation is avaliable here: https://docs.python.org/3/library/logging.config.html

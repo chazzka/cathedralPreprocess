@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 from sklearn.ensemble import IsolationForest
 from sklearn.svm import OneClassSVM
 from sklearn.covariance import EllipticEnvelope
@@ -17,11 +16,11 @@ import logging
 # returns list[-1=anomalies/1=no anomalies]
 def predict(df, model):
     prediction = model.predict(list(df))
-    # if observed value was 0, assign 1 - no anomaly
+    # if observed value was 0.0, assign 1 - no anomaly
     return map(lambda x,y: x[1] == 0 or y, df, prediction)
 
 
-def getClusters(xyValues, predicted, aiArgs):
+def getClusterLabels(xyValues, predicted, aiArgs):
     anomalies = map(lambda x: -x, predicted)
     
     return findCluster(xyValues,anomalies,aiArgs)

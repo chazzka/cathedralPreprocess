@@ -1,6 +1,6 @@
 import logging
 
-from ai.trainer import loadModel, predict, getClusters
+from ai.trainer import loadModel, predict, getClusterLabels
 from postprocessing.postprocessing import plotXyWithPredicted
 from mock.randomdatagenerator import createRandomData
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
         loadModel(config["args"]["modelPath"])
     )
 
-    clusters = getClusters(xyValues, predictedList, config["AI"])
+    clusters = getClusterLabels(xyValues, predictedList, config["AI"])
 
     plotXyWithPredicted(xyValues, clusters)
 

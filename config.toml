@@ -5,7 +5,7 @@ auth = ["a_ulrich@utb.cz", "EcCNVU/dS76jpE938WxRHRGmjRM="]
 url = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst"
 posturl = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst"
 daystostrip = 1000
-deviceIdLst = 50000
+deviceIdLst = 3
 apiDataIndentifier = "iot_device_data"
 
 [args]
