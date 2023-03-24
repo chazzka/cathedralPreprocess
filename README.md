@@ -72,12 +72,12 @@ docker build --network=host --tag cathedral .
 
 name your image
 ```sh
-docker run --network=host --name=cathedralimage cathedral
+docker run --network=host --name=cathedralcontainer cathedral
 ```
 
 look at the log file
 ```sh
-docker cp cathedralimage:/app/logs/debug.log /path/in/host/to/store/log
+docker cp cathedralcontainer:/app/logs/debug.log /path/in/host/to/store/log
 ```
 
 log format is:\
