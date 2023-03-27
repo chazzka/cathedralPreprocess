@@ -51,8 +51,8 @@ if __name__ == "__main__":
 
     config = getTomlFileToDict(configFile)
 
-    dataFromApi = fetchDataToDict(config["server"])
-
+    dataFromApi = fetchDataToDict(config["server"], config["server"]["date_to"] if config["server"]["date_to"] else getCurrentTimeAsDTString())
+    print(dataFromApi)
     preprocessedDict = preprocess(dataFromApi, config["args"])
 
     xyTupleList = list(map(lambda x: (
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     clustersLabels = getClusterLabels(
         xyTupleList, predictedIterator, config["AI"])
 
-    postData(xyTupleList, clustersLabels, preprocessedDict, config, False)
+    postData(xyTupleList, clustersLabels, preprocessedDict, config, True)
 
     print("done")
     sys.exit(0)

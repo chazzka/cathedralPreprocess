@@ -92,25 +92,31 @@ this file can be changed anytime by specifing different toml file in `Dockerfile
 ./config.toml
 
 ```toml
-auth = ["api_username", "api_password"]
+
 
 [server]
+auth = ["api_username", "api_password"]
 url = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst"
 posturl = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst"
+daystostrip = 1000 # number of days to subtract from NOW() or date_to
+date_to = false # false or "2023-01-20" - date to start substract from (if false, current date is taken)
+deviceIdLst = 3
+apiDataIndentifier = "iot_device_data"
+
 
 [args]
-daystostrip = 1000 # number of days to subtract from NOW()
 idColumnName = "@ID" # name of ID Column
-averageColumnName = "@iDevdAverageCurrent" # name of observed column
-timeColumnName = "@dDevdCasZpravy" # name of time column
-apiDataIndentifier = "iot_device_data" # data identifier form API
-deviceIdLst = 3 # device ID
-modelPath = "models/model.pckl" # where to find trained model
+averageColumnName = "@iDevdAverageCurrent" # name of observed column (y value)
+timeColumnName = "@dDevdCasZpravy"  # name of time column (x value)
+modelPath = "models/newmodel.pckl"  # where to find trained model
 # only for train.py
-newModelName = "newmodel" # how to name new trained model (saved to models/)
+newModelName = "newmodel"  # how to name new trained model (saved to models/)
 
+# args for AI algorithms, see README for info
 [AI]
+# training - anomalies
 contamination = 0.02 # (0, 0.5> The amount of contamination for traning of the data set, i.e. the proportion of outliers in the data set. (see training)
+# running - clusters
 eps = 7 # float, The maximum distance between two samples for one to be considered as in the neighborhood of the other
 min_samples = 10 # int, The number of samples in a neighborhood for a point to be considered as a cluster point. This includes the point itself.
 ```
