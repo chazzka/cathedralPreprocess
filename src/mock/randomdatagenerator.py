@@ -1,6 +1,5 @@
 from sklearn.datasets import make_blobs, make_regression
 import numpy as np
-import pandas as pd
 from itertools import *
 
 
@@ -20,10 +19,6 @@ def generateLinearSpace(n_samples=500, ymutator=lambda x: 5*x + 100):
     X_space = list(100* np.random.random_sample(n_samples))
     Y, labels = make_regression(n_features=1, n_samples=n_samples)
     return Result(list(X_space), list(map(ymutator, Y.flatten())))
-
-# @deprecated
-def generateRandomDataFrame(config, generators: list[Result]):
-    return pd.DataFrame({config["args"]["timeColumnName"]: combineListsOfStruct(generators, 'x'), config["args"]["averageColumnName"]: combineListsOfStruct(generators, 'y')})
 
 
 def generateRandomData(generators: list[Result]) -> chain:

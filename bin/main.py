@@ -64,7 +64,8 @@ if __name__ == "__main__":
         loadModel(config["args"]["modelPath"]),
     )
 
-    clustersLabels = getClusterLabels(xyTupleList, predictedIterator, config["AI"])
+    clustersLabels = getClusterLabels(
+        xyTupleList, predictedIterator, config["AI"])
 
     postData(xyTupleList, clustersLabels, preprocessedDict, config, False)
 
