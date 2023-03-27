@@ -25,14 +25,6 @@ def generateRandomData(generators: list[Result]) -> chain:
     return chain.from_iterable(map(lambda res: zip(res.x,res.y), generators))
 
 
-def createRandomDataFrame(config):
-    def s(x): return 2*x + 250
-    return generateRandomDataFrame(config, [
-        generateRandomClusters(),
-        generateLinearSpace(),
-        generateLinearSpace(20, s)
-    ])
-
 def createRandomData() -> chain:
     def s(x): return 2*x + 250
     return generateRandomData([
