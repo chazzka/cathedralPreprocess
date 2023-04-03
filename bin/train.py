@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-    data = fetchDataToDict(config["server"])
+    data = fetchDataToDict(config["server"], config["server"]["date_to"] if config["server"]["date_to"] else getCurrentTimeAsDTString())
 
     linearModel = getModel(data, config["args"], config["AI"])
 

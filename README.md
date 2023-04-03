@@ -11,17 +11,21 @@ source venv/bin/activate
 ```
 
 ```sh
-pip install
+pip install -r requirements.txt
+```
+
+```sh
+PYTHONPATH=$PYTHONPATH:./src python3 bin/main.py
 ```
 
 ## evaluating with default config.toml
 ```sh
-python3 src/main.py 
+PYTHONPATH=$PYTHONPATH:./src python3 bin/main.py
 ```
 
 ## evaluating with user defined config
 ```sh
-python3 src/main.py myconfig.toml
+PYTHONPATH=$PYTHONPATH:./src python3 bin/main.py myconfig.toml
 ```
 
 ## tests
@@ -145,7 +149,7 @@ python3 bin/train.py config.toml
 change Dockerfile CMD to 
 
 ```Dockerfile
-CMD ["PYTHONPATH=$PYTHONPATH:./src python3", "bin/train.py", "./config.toml"]
+CMD ["python3", "-u", "bin/train.py", "./config.toml"]
 ```
 
 ## Logging config file
