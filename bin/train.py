@@ -1,5 +1,5 @@
 from preprocessing.preprocessing import preprocess, filterOutZeros
-from ai.trainer import doTrain, saveModel
+from ai.trainer import doAnomalyTrain, saveModel
 import logging
 import sys
 import tomli
@@ -25,7 +25,7 @@ def getModel(data: dict, configArgs, aiArgs):
     noZeros = filterOutZeros(features, pos=1)
     
     #[[1,2], [4,0]]
-    return doTrain(list(noZeros), aiArgs)
+    return doAnomalyTrain(list(noZeros), aiArgs)
 
 
 if __name__ == "__main__":
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     data = fetchDataToDict(config["server"], config["server"]["date_to"] if config["server"]["date_to"] else getCurrentTimeAsDTString())
 
-    linearModel = getModel(data, config["args"], config["AI"])
+    linearModel = getModel(data, config["args"], config["anomaly"])
 
     saveModel(linearModel, f"{config['args']['newModelName']}.pckl")
 

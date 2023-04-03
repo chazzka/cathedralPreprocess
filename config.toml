@@ -19,9 +19,22 @@ newModelName = "newmodel"
 
 # args for AI algorithms, see README for info
 [AI]
-# training - anomalies
+# if anomaly detection is supervised (false) or unsupervised (true)
+fitPredict = true 
+predictClusters = false
+
+[anomaly]
 contamination = 0.02
-# running - clusters
+max_samples= "auto"
+
+[anomalymodel]
+path = "sklearn.ensemble"
+what = "IsolationForest"
+
+[clustermodel]
+path = "sklearn.cluster"
+what = "DBSCAN"
+
+[cluster]
 eps = 7
 min_samples = 10
-

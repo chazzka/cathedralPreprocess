@@ -1,4 +1,4 @@
-from sklearn.ensemble import IsolationForest
+#from sklearn.ensemble import IsolationForest
 from sklearn.svm import OneClassSVM
 from sklearn.covariance import EllipticEnvelope
 from sklearn.neighbors import LocalOutlierFactor
@@ -19,21 +19,27 @@ def predict(df, model):
     # if observed value was 0.0, assign 1 - no anomaly
     return map(lambda x,y: x[1] == 0 or y, df, prediction)
 
+def fitPredict(df, model):
+    prediction = model.fit_predict(list(df))
+    # if observed value was 0.0, assign 1 - no anomaly
+    return map(lambda x,y: x[1] == 0 or y, df, prediction)
 
-def getClusterLabels(xyValues, predicted, aiArgs):
+
+def getClusterLabels(xyValues, predicted, clusterArgs, modelArgs):
     anomalies = map(lambda x: -x, predicted)
-    
-    return findCluster(xyValues,anomalies,aiArgs)
+    model = getattr(__import__(modelArgs["path"], fromlist=[modelArgs["what"]]), modelArgs["what"])
+    return model(**clusterArgs).fit_predict(list(xyValues), list(anomalies))
 
 
-def doTrain(X_train, aiArgs):
-    return forestTrain(X_train, aiArgs["contamination"])
+def doAnomalyTrain(X_train, anomalyArgs, modelArgs):
+    model = getattr(__import__(modelArgs["path"], fromlist=[modelArgs["what"]]), modelArgs["what"])
+    return model(**anomalyArgs).fit(X_train)
 
 # 1 - not a cluster
 # 0 - is a cluster
 # SAMPLE WEIGHT - DB scan can ignore points with minus weight
-def findCluster(X_Train: Sequence[float], sample_weight, aiArgs):
-    return findClusterDBScan(X_Train, sample_weight, aiArgs["eps"], aiArgs["min_samples"])
+def findCluster(X_Train: Sequence[float], sample_weight, clusterArgs):
+    return findClusterDBScan(X_Train, sample_weight, **clusterArgs)
 
 
 def findClusterDBScan(X_train: Sequence[float], sample_weight, eps=7, min_samples=10):
@@ -44,9 +50,8 @@ def findClusterKMeans(X_train):
     return KMeans(n_clusters=2, random_state=0, n_init="auto", algorithm="lloyd").fit_predict(X_train)
 
 
-def forestTrain(X_train, contamination=0.02):
-    clf = IsolationForest(max_samples='auto', random_state=0,
-                          contamination=contamination)
+def forestTrain(X_train, forestArgs):
+    clf = IsolationForest(**forestArgs)
     return clf.fit(X_train)
 
 

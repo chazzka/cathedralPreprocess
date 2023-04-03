@@ -65,9 +65,9 @@ if __name__ == "__main__":
     )
 
     clustersLabels = getClusterLabels(
-        xyTupleList, predictedIterator, config["AI"])
+        xyTupleList, predictedIterator, config["cluster"])
 
-    postData(xyTupleList, clustersLabels, preprocessedDict, config, True)
+    postData(xyTupleList, clustersLabels, preprocessedDict, config, False)
 
     print("done")
     sys.exit(0)

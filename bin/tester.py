@@ -1,6 +1,6 @@
 import logging
 
-from ai.trainer import loadModel, predict, getClusterLabels
+from ai.trainer import loadModel, predict, fitPredict, getClusterLabels, doAnomalyTrain
 from postprocessing.postprocessing import plotXyWithPredicted
 from mock.randomdatagenerator import createRandomData
 
@@ -30,14 +30,24 @@ if __name__ == "__main__":
     config = getConfigFile(configFile)
 
     xyValues = list(createRandomData())
-    predictedList = predict(
-        xyValues,
-        loadModel(config["args"]["modelPath"])
-    )
 
-    clusters = getClusterLabels(xyValues, predictedList, config["AI"])
+    
+    if config["AI"]["fitPredict"]:
+        predictedList = predict(
+            xyValues,
+            loadModel(config["args"]["modelPath"])
+        )
+    else:
+        predictedList = fitPredict(
+            xyValues,
+            doAnomalyTrain(xyValues, config["anomaly"], config["anomalymodel"])
+        )
 
-    plotXyWithPredicted(xyValues, clusters)
+    if config["AI"]["predictClusters"]:
+        clusters = getClusterLabels(xyValues, predictedList, config["cluster"], config["clustermodel"])
+        plotXyWithPredicted(xyValues, clusters)
+    else:
+        plotXyWithPredicted(xyValues, list(predictedList))
 
     print("done")
     sys.exit(0)
