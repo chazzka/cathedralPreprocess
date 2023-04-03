@@ -1,5 +1,5 @@
 from preprocessing.preprocessing import filterOutZeros
-from ai.trainer import doTrain, saveModel
+from ai.trainer import doAnomalyTrain, saveModel
 import logging
 import sys
 import tomli
@@ -18,11 +18,11 @@ def getConfigFile(path):
         return tomli.load(fp)
 
 
-def getModel(iterator, aiArgs):
+def getModel(iterator, aiArgs, modelArgs):
     # now training is done for non zeros data
     noZeros = filterOutZeros(iterator, 1)
     #[[1,2], [4,5]]
-    return doTrain(list(noZeros), aiArgs)
+    return doAnomalyTrain(list(noZeros), aiArgs, modelArgs)
 
 
 if __name__ == "__main__":
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     # data = fetchDataToDict(config["server"])
 
-    linearModel = getModel(createRandomData(), config["AI"])
+    linearModel = getModel(createRandomData(), config["anomaly"], config["anomalymodel"])
 
     saveModel(linearModel, f"{config['args']['newModelName']}.pckl")
 

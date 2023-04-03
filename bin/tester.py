@@ -3,6 +3,9 @@ import logging
 from ai.trainer import loadModel, predict, fitPredict, getClusterLabels, doAnomalyTrain
 from postprocessing.postprocessing import plotXyWithPredicted
 from mock.randomdatagenerator import createRandomData
+import numpy as np
+
+from itertools import combinations_with_replacement, combinations, product
 
 import sys
 import tomli
@@ -29,7 +32,21 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
+
+    x = map(lambda x: (x, 1), range(100))
+    x = np.linspace(0.1,100)
+    y = np.linspace(0.1,250)
+
+    
+   
+    # training data
     xyValues = list(createRandomData())
+
+    #for test
+
+    #xyValues = list(combinations(range(0,250),2)) + list(combinations(range(250,0,-1),2))
+    
+    xyValues = list(product(range(100), range(250)))
 
     if config["AI"]["predictAnomalies"]:
         if config["AI"]["fitPredict"]:

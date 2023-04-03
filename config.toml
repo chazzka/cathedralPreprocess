@@ -20,9 +20,9 @@ newModelName = "newmodel"
 # args for AI algorithms, see README for info
 [AI]
 # if anomaly detection is supervised (false) or unsupervised (true)
-fitPredict = true
+fitPredict = false
 predictAnomalies = true
-predictClusters = true
+predictClusters = false
 
 [anomalymodel]
 path = "sklearn.ensemble"
