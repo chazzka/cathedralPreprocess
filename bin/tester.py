@@ -31,20 +31,26 @@ if __name__ == "__main__":
 
     xyValues = list(createRandomData())
 
-    
-    if config["AI"]["fitPredict"]:
-        predictedList = predict(
-            xyValues,
-            loadModel(config["args"]["modelPath"])
-        )
+    if config["AI"]["predictAnomalies"]:
+        if config["AI"]["fitPredict"]:
+            predictedList = fitPredict(
+                xyValues,
+                doAnomalyTrain(
+                    xyValues, config["anomaly"], config["anomalymodel"])
+            )
+        else:
+            predictedList = predict(
+                xyValues,
+                loadModel(config["args"]["modelPath"])
+            )
     else:
-        predictedList = fitPredict(
-            xyValues,
-            doAnomalyTrain(xyValues, config["anomaly"], config["anomalymodel"])
-        )
+        predictedList = map(lambda x: -1, xyValues)
+        print(predictedList)
+        print("ano")
 
     if config["AI"]["predictClusters"]:
-        clusters = getClusterLabels(xyValues, predictedList, config["cluster"], config["clustermodel"])
+        clusters = getClusterLabels(
+            xyValues, predictedList, config["cluster"], config["clustermodel"])
         plotXyWithPredicted(xyValues, clusters)
     else:
         plotXyWithPredicted(xyValues, list(predictedList))

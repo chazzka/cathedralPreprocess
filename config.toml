@@ -20,16 +20,17 @@ newModelName = "newmodel"
 # args for AI algorithms, see README for info
 [AI]
 # if anomaly detection is supervised (false) or unsupervised (true)
-fitPredict = true 
-predictClusters = false
-
-[anomaly]
-contamination = 0.02
-max_samples= "auto"
+fitPredict = true
+predictAnomalies = true
+predictClusters = true
 
 [anomalymodel]
 path = "sklearn.ensemble"
 what = "IsolationForest"
+
+[anomaly]
+contamination = 0.25
+max_samples= "auto"
 
 [clustermodel]
 path = "sklearn.cluster"

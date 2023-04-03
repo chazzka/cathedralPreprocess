@@ -28,7 +28,7 @@ def fitPredict(df, model):
 def getClusterLabels(xyValues, predicted, clusterArgs, modelArgs):
     anomalies = map(lambda x: -x, predicted)
     model = getattr(__import__(modelArgs["path"], fromlist=[modelArgs["what"]]), modelArgs["what"])
-    return model(**clusterArgs).fit_predict(list(xyValues), list(anomalies))
+    return model(**clusterArgs).fit_predict(list(xyValues), sample_weight=list(anomalies))
 
 
 def doAnomalyTrain(X_train, anomalyArgs, modelArgs):
