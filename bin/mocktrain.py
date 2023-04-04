@@ -1,10 +1,11 @@
 from preprocessing.preprocessing import filterOutZeros
-from ai.trainer import doAnomalyTrain, saveModel
+from ai.trainer import doTrain, saveModel
 import logging
 import sys
 import tomli
-from service.request import fetchDataToDict
 from mock.randomdatagenerator import createRandomData
+
+from sklearn.ensemble import IsolationForest as model
 
 from datetime import datetime, timedelta
 
@@ -22,7 +23,7 @@ def getModel(iterator, aiArgs, modelArgs):
     # now training is done for non zeros data
     noZeros = filterOutZeros(iterator, 1)
     #[[1,2], [4,5]]
-    return doAnomalyTrain(list(noZeros), aiArgs, modelArgs)
+    return doTrain(list(noZeros), aiArgs, modelArgs)
 
 
 if __name__ == "__main__":
@@ -39,9 +40,7 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-    # data = fetchDataToDict(config["server"])
-
-    linearModel = getModel(createRandomData(), config["anomaly"], config["anomalymodel"])
+    linearModel = getModel(createRandomData(), config["anomaly"], model)
 
     saveModel(linearModel, f"{config['args']['newModelName']}.pckl")
 

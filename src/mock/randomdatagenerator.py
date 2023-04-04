@@ -9,14 +9,14 @@ class Result:
         self.y = y
 
 
-def generateRandomClusters(n_samples=100, centers=[(80, 250), (20,255)]):
+def generateRandomClusters(centers, n_samples=100):
     features, Y1 = make_blobs(
         n_samples=n_samples, n_features=2, centers=centers, cluster_std=7)
     return Result(list(features[:, 0]), list(features[:, 1]))
 
 
-def generateLinearSpace(n_samples=500, ymutator=lambda x: 5*x + 100):
-    X_space = list(100* np.random.random_sample(n_samples))
+def generateLinearSpace(n_samples=500, ymutator=lambda x: 5*x + 100, leftBoundary=0, rightBoundary=100):
+    X_space = list(rightBoundary* np.random.random_sample(n_samples) +leftBoundary)
     Y, labels = make_regression(n_features=1, n_samples=n_samples)
     return Result(list(X_space), list(map(ymutator, Y.flatten())))
 
@@ -27,10 +27,13 @@ def generateRandomData(generators: list[Result]) -> chain:
 
 def createRandomData() -> chain:
     def s(x): return 2*x + 250
+    def r(x): return 2*x + 150
     return generateRandomData([
-        generateRandomClusters(),
-        generateLinearSpace(),
+        generateRandomClusters(centers=[(80, 250), (20,255), (30,150)]),
+        generateLinearSpace(leftBoundary=50,rightBoundary=100),
+        generateLinearSpace(leftBoundary=0,rightBoundary=40),
         generateLinearSpace(20, s),
+        generateLinearSpace(20, r),
     ])
 
 

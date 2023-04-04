@@ -21,8 +21,6 @@ newModelName = "newmodel"
 [AI]
 # if anomaly detection is supervised (false) or unsupervised (true)
 fitPredict = false
-predictAnomalies = true
-predictClusters = false
 
 [anomalymodel]
 path = "sklearn.ensemble"

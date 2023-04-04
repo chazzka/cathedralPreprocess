@@ -1,14 +1,13 @@
-import logging
-
-from ai.trainer import loadModel, predict, fitPredict, getClusterLabels, doAnomalyTrain
+from ai.trainer import predict, fitPredict, getClusterLabels, doTrain
 from postprocessing.postprocessing import plotXyWithPredicted
 from mock.randomdatagenerator import createRandomData
-import numpy as np
-
-from itertools import combinations_with_replacement, combinations, product
-
 import sys
 import tomli
+from itertools import product
+
+
+from sklearn.ensemble import IsolationForest as anomalymodel
+from sklearn.cluster import DBSCAN as clustermodel
 
 
 def getConfigFile(path):
@@ -16,15 +15,12 @@ def getConfigFile(path):
         return tomli.load(fp)
 
 
+def trainModel(iterator, aiArgs, model):
+    # [[1,2], [4,5]]
+    return doTrain(list(iterator), aiArgs, model)
+
+
 if __name__ == "__main__":
-
-    logging.basicConfig(filename='./logs/debug.log',
-                        format='%(asctime)s %(levelname)-8s %(message)s',
-                        encoding='utf-8', level=logging.INFO,
-                        datefmt='%Y-%m-%d %H:%M:%S')
-
-    logging.info("starting script")
-
     try:
         configFile = sys.argv[1]
     except IndexError:
@@ -32,45 +28,33 @@ if __name__ == "__main__":
 
     config = getConfigFile(configFile)
 
-
-    x = map(lambda x: (x, 1), range(100))
-    x = np.linspace(0.1,100)
-    y = np.linspace(0.1,250)
-
-    
-   
     # training data
-    xyValues = list(createRandomData())
+    trainXyValues = list(createRandomData())
 
-    #for test
+    # for test
+    testXyValues = list(product(range(100), range(250)))
 
-    #xyValues = list(combinations(range(0,250),2)) + list(combinations(range(250,0,-1),2))
-    
-    xyValues = list(product(range(100), range(250)))
+    trainedModel = trainModel(trainXyValues, config["anomaly"], anomalymodel)
 
-    if config["AI"]["predictAnomalies"]:
-        if config["AI"]["fitPredict"]:
-            predictedList = fitPredict(
-                xyValues,
-                doAnomalyTrain(
-                    xyValues, config["anomaly"], config["anomalymodel"])
-            )
-        else:
-            predictedList = predict(
-                xyValues,
-                loadModel(config["args"]["modelPath"])
-            )
-    else:
-        predictedList = map(lambda x: -1, xyValues)
-        print(predictedList)
-        print("ano")
-
-    if config["AI"]["predictClusters"]:
+    if config["AI"]["fitPredict"]:
+        predictedList = list(fitPredict(
+            trainXyValues,
+            trainedModel
+        ))
+        plotXyWithPredicted(trainXyValues, predictedList)
         clusters = getClusterLabels(
-            xyValues, predictedList, config["cluster"], config["clustermodel"])
-        plotXyWithPredicted(xyValues, clusters)
+            trainXyValues, predictedList, config["cluster"], clustermodel)
+        plotXyWithPredicted(trainXyValues, clusters)
     else:
-        plotXyWithPredicted(xyValues, list(predictedList))
+        predictedList = list(predict(
+            testXyValues,
+            trainedModel
+        ))
+        clusters = getClusterLabels(
+            testXyValues, predictedList, config["cluster"], clustermodel)
+        plotXyWithPredicted(testXyValues, predictedList)
+        plotXyWithPredicted(testXyValues, clusters)
+    
 
     print("done")
     sys.exit(0)
