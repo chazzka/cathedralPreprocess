@@ -5,10 +5,14 @@ import sys
 import tomli
 from itertools import product
 
+import numpy as np
+
+import matplotlib.pyplot as plt
 
 from sklearn.ensemble import IsolationForest as anomalymodel
 from sklearn.cluster import DBSCAN as clustermodel
 
+from articletester.articletester import *
 
 def getConfigFile(path):
     with open(path, mode="rb") as fp:
@@ -30,6 +34,10 @@ if __name__ == "__main__":
 
     # training data
     trainXyValues = list(createRandomData())
+
+    plotDataWithMean(trainXyValues)
+    
+    sys.exit(1)
 
     # for test
     testXyValues = list(product(range(100), range(250)))
