@@ -62,13 +62,13 @@ if __name__ == "__main__":
         xTupleList ,
         loadModel(config["args"]["modelPath"]),
     )
-
+    originalList = list(map(lambda x: (x[config["args"]["timeColumnName"]], x[config["args"]["averageColumnName"]]), preprocessedDict))
+    # plotXyWithPredicted(originalList, list(map(lambda x: "#ff7f0e" if x == -1 else "#2ca02c", predictedIterator)))
+    
     clustersLabels = getClusterLabels(
         xTupleList , predictedIterator, config["AI"])
     
     postData(xTupleList , clustersLabels, preprocessedDict, config, True)
-    originalList = list(map(lambda x: (x[config["args"]["timeColumnName"]], x[config["args"]["averageColumnName"]]), preprocessedDict))
-    # plotXyWithPredicted(originalList, list(map(lambda x: "#ff7f0e" if x == -1 else "#2ca02c", predictedIterator)))
     # plotXyWithPredicted(originalList, list(map(lambda x: "#ff7f0e" if x == -1 else "#2ca02c", clustersLabels)))
     print("done")
     sys.exit(0)

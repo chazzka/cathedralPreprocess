@@ -4,6 +4,7 @@ import logging
 import sys
 import tomli
 from service.request import fetchDataToDict
+from random import sample
 
 from datetime import datetime, timedelta
 
@@ -19,10 +20,13 @@ def getConfigFile(path):
 
 def getModel(data: dict, configArgs, aiArgs):
     preprocessed = preprocess(data, configArgs)
-    
     # now training is done for non zeros data
-    features = map(lambda x: [x[configArgs["averageColumnName"]]], preprocessed)
+    features = map(lambda x: x[configArgs["averageColumnName"]], preprocessed)
     noZeros = filter(lambda x:x != 0, features)
+    noDuplicates = dict.fromkeys(noZeros)
+    
+    # noDuplicates = [89.0, 87.0, 90.0, 85.0, 85.0, 150.0,145.0,98.0, 86.0, 82.0, 87.0, 90.0, 91.0, 87.0, 84.0, 90.0, 86.0, 90.0, 90.0, 92.0, 87.0, 84.0, 86.0, 90.0, 91.0, 88.0, 89.0, 83.0, 86.0, 88.0, 84.0, 89.0, 92.0, 86.0, 85.0, 91.0, 91.0, 91.0, 87.0, 85.0, 89.0, 84.0, 83.0,110.0,130.0,67.0,68.0]
+    noZeros = map(lambda x: [x], noDuplicates)
     
     #[[1,2], [4,0]]
     return doTrain(list(noZeros), aiArgs)

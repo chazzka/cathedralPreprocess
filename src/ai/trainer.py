@@ -53,7 +53,7 @@ def forestTrain(X_train, contamination=0.02):
 
 
 def svmTrain(X_train):
-    return OneClassSVM(kernel='linear', nu=0.1).fit(X_train)
+    return OneClassSVM().fit(X_train)
 
 
 def sdgSvmTrain(X_train):
@@ -69,7 +69,7 @@ def ellipticFitPredict(X_train):
 
 
 def localOutlierTrain(X_train):
-    return LocalOutlierFactor(novelty=True).fit(X_train)
+    return LocalOutlierFactor(novelty=True, n_neighbors=50, p=1).fit(X_train)
 
 
 def saveModel(model, filename):

@@ -1,11 +1,13 @@
 # config.toml
 
 [server]
-auth = ["api_username", "api_password"]
+auth = ["a_ulrich@utb.cz", "EcCNVU/dS76jpE938WxRHRGmjRM="]
 url = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst"
 posturl = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst"
-daystostrip = 447
+
+daystostrip = 5000
 date_to = "2022-08-30" # false or "2023-01-20"
+
 deviceIdLst = 3
 apiDataIndentifier = "iot_device_data"
 
