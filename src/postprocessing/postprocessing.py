@@ -40,9 +40,8 @@ def prepareRowsXML(idAnomalyDics: list[Row]):
 def plotXyWithPredicted(xyArray, predicted):
     fig = plt.figure()
     ax1 = fig.add_subplot()
-
     ax1.scatter(*zip(*xyArray),  c=predicted)
     plt.legend(loc='upper left')
     plt.xlabel("Time")
     plt.ylabel("Observed value")
-    plt.show()
+    plt.savefig("test.png")

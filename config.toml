@@ -4,8 +4,8 @@
 auth = ["api_username", "api_password"]
 url = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/GetRecordLst"
 posturl = "https://intern.smart.ariscat.com/datasnap/rest/TARSMethods/RecordLst"
-daystostrip = 1000
-date_to = false # false or "2023-01-20"
+daystostrip = 447
+date_to = "2022-08-30" # false or "2023-01-20"
 deviceIdLst = 3
 apiDataIndentifier = "iot_device_data"
 
@@ -22,6 +22,6 @@ newModelName = "newmodel"
 # training - anomalies
 contamination = 0.02
 # running - clusters
-eps = 7
-min_samples = 10
+eps = 3
+min_samples = 2
 

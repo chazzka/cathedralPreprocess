@@ -17,7 +17,7 @@ import logging
 def predict(df, model):
     prediction = model.predict(list(df))
     # if observed value was 0.0, assign 1 - no anomaly
-    return map(lambda x,y: x[1] == 0 or y, df, prediction)
+    return map(lambda x,y: 1 if x == 0 else y, df, prediction)
 
 
 def getClusterLabels(xyValues, predicted, aiArgs):
@@ -27,21 +27,23 @@ def getClusterLabels(xyValues, predicted, aiArgs):
 
 
 def doTrain(X_train, aiArgs):
-    return forestTrain(X_train, aiArgs["contamination"])
+    # return forestTrain(X_train, aiArgs["contamination"])
+    return localOutlierTrain(X_train)
 
 # 1 - not a cluster
 # 0 - is a cluster
 # SAMPLE WEIGHT - DB scan can ignore points with minus weight
 def findCluster(X_Train: Sequence[float], sample_weight, aiArgs):
     return findClusterDBScan(X_Train, sample_weight, aiArgs["eps"], aiArgs["min_samples"])
+    # return findClusterKMeans(X_Train, sample_weight)
 
 
 def findClusterDBScan(X_train: Sequence[float], sample_weight, eps=7, min_samples=10):
     return DBSCAN(eps=eps, min_samples=min_samples).fit_predict(list(X_train), sample_weight=list(sample_weight))
 
 
-def findClusterKMeans(X_train):
-    return KMeans(n_clusters=2, random_state=0, n_init="auto", algorithm="lloyd").fit_predict(X_train)
+def findClusterKMeans(X_train, sample_weight):
+    return KMeans(n_clusters=2, random_state=0, n_init="auto", algorithm="lloyd").fit_predict(list(X_train), sample_weight=list(sample_weight))
 
 
 def forestTrain(X_train, contamination=0.02):

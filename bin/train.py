@@ -21,8 +21,8 @@ def getModel(data: dict, configArgs, aiArgs):
     preprocessed = preprocess(data, configArgs)
     
     # now training is done for non zeros data
-    features = map(lambda x: [x[configArgs["timeColumnName"]], x[configArgs["averageColumnName"]]], preprocessed)
-    noZeros = filterOutZeros(features, pos=1)
+    features = map(lambda x: [x[configArgs["averageColumnName"]]], preprocessed)
+    noZeros = filter(lambda x:x != 0, features)
     
     #[[1,2], [4,0]]
     return doTrain(list(noZeros), aiArgs)

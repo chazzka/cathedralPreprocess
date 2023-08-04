@@ -4,7 +4,8 @@ from preprocessing.preprocessing import preprocess, getCurrentTimeAsDTString
 from ai.trainer import loadModel, predict, getClusterLabels
 from postprocessing.postprocessing import postprocess, plotXyWithPredicted
 from service.request import fetchToJsonWithHeaders, fetchDataToDict
-
+import numpy as np
+import matplotlib.pyplot as plt
 import sys
 import tomli
 
@@ -15,7 +16,6 @@ def getTomlFileToDict(path):
 
 
 def postData(xyArray, predicted, dataFromApi, config, shouldSend=False):
-    print(predicted)
     if shouldSend:
         data = {"_parameters": [config["server"]["apiDataIndentifier"], "", 0]}
 
@@ -25,7 +25,7 @@ def postData(xyArray, predicted, dataFromApi, config, shouldSend=False):
 
         postprocessed = postprocess(
             map(lambda x: x[config["args"]["idColumnName"]], dataFromApi),
-            map(lambda x: x != -1 or 1, predicted), headers
+            map(lambda x: 1 if x == -1 else 0, predicted), headers
         )
 
         # send result POST
@@ -52,22 +52,23 @@ if __name__ == "__main__":
     config = getTomlFileToDict(configFile)
 
     dataFromApi = fetchDataToDict(config["server"], config["server"]["date_to"] if config["server"]["date_to"] else getCurrentTimeAsDTString())
-    print(dataFromApi)
     preprocessedDict = preprocess(dataFromApi, config["args"])
 
-    xyTupleList = list(map(lambda x: (
-        x[config["args"]["timeColumnName"]], x[config["args"]["averageColumnName"]]), preprocessedDict))
+    xTupleList = np.array(list(map(lambda x: (
+        x[config["args"]["averageColumnName"]]), preprocessedDict))).reshape(-1,1)
 
     # evaluate model (accept dataframe and model, return trained dataframe)
     predictedIterator = predict(
-        xyTupleList,
+        xTupleList ,
         loadModel(config["args"]["modelPath"]),
     )
 
     clustersLabels = getClusterLabels(
-        xyTupleList, predictedIterator, config["AI"])
-
-    postData(xyTupleList, clustersLabels, preprocessedDict, config, True)
-
+        xTupleList , predictedIterator, config["AI"])
+    
+    postData(xTupleList , clustersLabels, preprocessedDict, config, True)
+    originalList = list(map(lambda x: (x[config["args"]["timeColumnName"]], x[config["args"]["averageColumnName"]]), preprocessedDict))
+    # plotXyWithPredicted(originalList, list(map(lambda x: "#ff7f0e" if x == -1 else "#2ca02c", predictedIterator)))
+    # plotXyWithPredicted(originalList, list(map(lambda x: "#ff7f0e" if x == -1 else "#2ca02c", clustersLabels)))
     print("done")
     sys.exit(0)
